@@ -16,12 +16,36 @@ const userAuthUsecase_1 = __importDefault(require("../../../app/usecases/users/u
 exports.default = {
     registerUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            console.log({ userData: req.body });
-            res.json(yield userAuthUsecase_1.default.registerUser(req.body));
+            const user = yield userAuthUsecase_1.default.registerUser(req.body, req);
+            res.status(200).json({ message: "User registered successfully", user });
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }),
+    verifyOtp: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { email } = req.body;
+            const { user, token } = yield userAuthUsecase_1.default.verifyUser(email, req);
+            console.log(user);
+            console.log(token);
+            res.status(200).json({ message: 'OTP verified', user, token });
+        }
+        catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }),
+    loginUser: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const { email, password } = req.body;
+            const user = yield userAuthUsecase_1.default.loginUser(email, password);
+            console.log({ user });
+            res.status(200).json({ message: 'logged in success',
+                user
+            });
         }
         catch (error) {
             res.status(500).json({ error: error.message });
         }
     })
 };
-//# sourceMappingURL=userAuthController.js.map

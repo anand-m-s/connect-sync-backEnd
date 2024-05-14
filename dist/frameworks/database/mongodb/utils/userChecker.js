@@ -14,9 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkExistingUser = void 0;
 const user_1 = __importDefault(require("../models/user"));
-const checkExistingUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const existingUser = yield user_1.default.findOne({ email });
+const checkExistingUser = (email, userName) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingUser = yield user_1.default.findOne({ $or: [{ email: email }, { userName: userName }] });
     return existingUser;
 });
 exports.checkExistingUser = checkExistingUser;
-//# sourceMappingURL=userChecker.js.map

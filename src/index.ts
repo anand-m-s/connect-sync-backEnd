@@ -3,6 +3,7 @@ import connectDB from "./frameworks/database/mongodb/connection"
 import serverConfig from "./frameworks/webserver/server"
 import expressConfig from "./frameworks/webserver/express"
 import {userRouter} from './frameworks/webserver/routes/user'
+import { adminRouter } from "./frameworks/webserver/routes/admin"
 import http from "http"
 import colors from 'colors.ts'
 
@@ -16,8 +17,9 @@ connectDB()
 
 expressConfig(app)
 
-//routes for each endpoint
 app.use('/api',userRouter)
+app.use('/api/admin',adminRouter)
+
 
 serverConfig(server).startServer();
 

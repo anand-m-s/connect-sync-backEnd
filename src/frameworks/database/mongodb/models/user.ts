@@ -7,8 +7,10 @@ export interface UserDocument extends Document {
     password: string;
     phone: string | null;
     isBlocked: boolean;
+    isVerified:boolean;
+    isGoogle:boolean;
+    matchPassword(enteredPassword: string): Promise<boolean>;
 }
-
 
 const userSchema: Schema<UserDocument> = new Schema(
     {
@@ -25,12 +27,19 @@ const userSchema: Schema<UserDocument> = new Schema(
             required: true,
         },
         phone: {
-            type: String,
-            required: true
+            type: String,        
         },
         isBlocked: {
             type: Boolean,
             default: false
+        },
+        isVerified:{
+            type:Boolean,
+            default:false
+        },
+        isGoogle:{
+            type:Boolean,
+            default:false
         }
     },
     {

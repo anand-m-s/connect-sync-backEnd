@@ -8,4 +8,5 @@ const express_1 = __importDefault(require("express"));
 const userAuthController_1 = __importDefault(require("../../../adapters/controllers/user/userAuthController"));
 exports.userRouter = express_1.default.Router();
 exports.userRouter.post('/register', userAuthController_1.default.registerUser);
-//# sourceMappingURL=user.js.map
+exports.userRouter.post('/verifyOtp', userAuthController_1.default.verifyOtp);
+exports.userRouter.post('/login', userAuthController_1.default.loginUser);

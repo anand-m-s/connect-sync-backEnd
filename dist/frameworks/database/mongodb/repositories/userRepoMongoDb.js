@@ -13,17 +13,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.saveUser = void 0;
-const user_js_1 = __importDefault(require("../models/user.js"));
-const userChecker_js_1 = require("../utils/userChecker.js");
+const user_1 = __importDefault(require("../models/user"));
+const userChecker_1 = require("../utils/userChecker");
 const saveUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const existingUser = yield (0, userChecker_js_1.checkExistingUser)(data.email);
+        const existingUser = yield (0, userChecker_1.checkExistingUser)(data.email, data.userName);
         if (existingUser) {
             // Handle the case where the user already exists
             // You might want to throw an error or return a specific message
-            throw new Error("A user with that email already exists.");
+            throw new Error("A user with that email or username already exists.");
         }
-        const user = new user_js_1.default(Object.assign({}, data));
+        const user = new user_1.default(Object.assign({}, data));
         return yield user.save();
     }
     catch (error) {
@@ -31,4 +31,3 @@ const saveUser = (data) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.saveUser = saveUser;
-//# sourceMappingURL=userRepoMongoDb.js.map

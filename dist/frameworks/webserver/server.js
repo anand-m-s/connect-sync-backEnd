@@ -12,4 +12,3 @@ const serverConfig = (server) => {
     };
 };
 exports.default = serverConfig;
-//# sourceMappingURL=server.js.map

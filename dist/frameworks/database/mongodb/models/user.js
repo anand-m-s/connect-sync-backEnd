@@ -57,6 +57,10 @@ const userSchema = new mongoose_1.Schema({
     isBlocked: {
         type: Boolean,
         default: false
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
@@ -79,4 +83,3 @@ userSchema.methods.matchPassword = function (enteredPassword) {
 };
 const User = mongoose_1.default.model('User', userSchema);
 exports.default = User;
-//# sourceMappingURL=user.js.map

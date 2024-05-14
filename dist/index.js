@@ -15,7 +15,5 @@ const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 (0, connection_1.default)();
 (0, express_2.default)(app);
-//routes for each endpoint
 app.use('/api', user_1.userRouter);
 (0, server_1.default)(server).startServer();
-//# sourceMappingURL=index.js.map
