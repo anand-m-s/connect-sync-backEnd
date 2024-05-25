@@ -7,8 +7,10 @@ export interface UserDocument extends Document {
     password: string;
     phone: string | null;
     isBlocked: boolean;
-    isVerified:boolean;
-    isGoogle:boolean;
+    isVerified: boolean;
+    isGoogle: boolean;
+    profilePic:string;
+    bio:string
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -27,19 +29,24 @@ const userSchema: Schema<UserDocument> = new Schema(
             required: true,
         },
         phone: {
-            type: String,        
+            type: String,
         },
         isBlocked: {
             type: Boolean,
             default: false
         },
-        isVerified:{
-            type:Boolean,
-            default:false
+        isVerified: {
+            type: Boolean,
+            default: false
         },
-        isGoogle:{
-            type:Boolean,
-            default:false
+        isGoogle: {
+            type: Boolean,
+            default: false
+        }, profilePic: {
+            type: String
+        },
+        bio:{
+            type:String
         }
     },
     {
@@ -58,11 +65,11 @@ userSchema.pre<UserDocument>("save", async function (next) {
     }
 })
 
-userSchema.methods.matchPassword = async function(enteredPassword:string){
-    return await bcrypt.compare(enteredPassword,this.password)
+userSchema.methods.matchPassword = async function (enteredPassword: string) {
+    return await bcrypt.compare(enteredPassword, this.password)
 }
 
-const User = mongoose.model('User',userSchema);
+const User = mongoose.model('User', userSchema);
 
 export default User;
 

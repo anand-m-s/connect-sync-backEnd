@@ -7,6 +7,7 @@ export interface AdminDocument extends Document {
   mobile: string;
   email: string;
   password: string;
+  matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
 const adminSchema: Schema<AdminDocument> = new Schema(
@@ -18,7 +19,7 @@ const adminSchema: Schema<AdminDocument> = new Schema(
     mobile: {
       type: String,
       required: true,
-    },
+    },  
     email: {
       type: String,
       required: true,
