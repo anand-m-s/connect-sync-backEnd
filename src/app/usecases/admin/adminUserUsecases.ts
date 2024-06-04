@@ -11,7 +11,8 @@ export const adminUserUsecases = {
     },
     blockUser:async(userId:string)=>{
         try {
-             await adminRepo.blockUser(userId)
+             const status = await adminRepo.blockUser(userId)
+             return status
         } catch (error) {
             throw new Error((error as Error).message);
         }

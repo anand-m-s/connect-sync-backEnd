@@ -18,7 +18,7 @@ export const adminRepo = {
     },
     fetchAllusers: async (): Promise<UserDocument[] | null> => {
         try {
-            const users = await User.find({}).select('userName email isBlocked').lean();
+            const users = await User.find({}).select('userName email isBlocked profilePic').lean();
             return users || null;
         } catch (error) {
             throw new Error((error as Error).message);
@@ -31,7 +31,8 @@ export const adminRepo = {
                 throw new Error('user not found')
             }
             user.isBlocked = !user.isBlocked
-            await user.save()            
+            await user.save()       
+            return user.isBlocked? 'user blocked' :'unblocked'
         } catch (error) {
             throw new Error((error as Error).message)
         }

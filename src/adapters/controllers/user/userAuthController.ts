@@ -19,7 +19,7 @@ export default {
                 sessionData.otpGeneratedTime = Date.now();
                 sendVerifyMail(req, userName, email)
             }
-            res.status(200).json({ message: "User registered successfully", user });
+            res.status(200).json({ message: "User registered please verify otp now", user });
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
@@ -32,9 +32,7 @@ export default {
             }
             expiryCheck(req)
             cleanupSessionData(req)
-            const { user, token } = await userAuthUsecase.verifyUser(email)
-            console.log(user)
-            console.log(token)
+            const { user, token } = await userAuthUsecase.verifyUser(email)        
             res.status(200).json({ message: 'OTP verified', user, token })
         }
         catch (error) {
@@ -78,33 +76,32 @@ export default {
             res.status(500).json({ error: (error as Error).message })
         }
     },
-    updateProfile: async (req: Request, res: Response) => {
-        console.log(req.body)
+    forgotPassword: async (req: Request, res: Response) => {
         try {
-            const updatedUser = await userAuthUsecase.updateProfileUseCase(req.body);
-            res.json(updatedUser);
+            const { email } = req.body;
+            const data: any = await userAuthUsecase.forgotPassword(email);
+            if (data.email) {
+                cleanupSessionData(req)
+                const otp = generateOtp()
+                const sessionData = req.session!;
+                sessionData.otp = otp;
+                sessionData.otpGeneratedTime = Date.now();
+                await sendVerifyMail(req, data.userName, data.email);
+            }
+            res.status(200).json(data);
         } catch (error) {
-            res.status(500).json({ error: (error as Error).message })
+            res.status(500).json({ error: (error as Error).message });
         }
-
     },
-    getUserDetails: async (req: Request, res: Response) => {
+    updatePassword:async(req:Request,res:Response)=>{
         try {
-            console.log('inside getUserdetails')
-            const userId = req.query.id
-            if (typeof userId !== 'string') {
-                res.status(400).json({ error: 'Invalid user ID' });
-                return;
-              }
-          
-            const userDetails = await userAuthUsecase.getUserDetails({ id: userId });
-            res.json(userDetails)
-
+            const {newPassword,email} = req.body
+            console.log(email,newPassword)
+            res.status(200).json(await userAuthUsecase.updatePassword(newPassword,email))            
         } catch (error) {
-            res.status(500).json({ error: (error as Error).message })
+            res.status(500).json({ error: (error as Error).message });
         }
     }
-
 
 
 }

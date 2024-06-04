@@ -5,4 +5,5 @@ export interface userRegisterInterface{
     userName:string;
     password:string;
     phone:string;
+    profilePic:string;
 }

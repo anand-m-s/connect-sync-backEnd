@@ -1,7 +1,9 @@
 import mongoose,{Schema,Document, ObjectId, SchemaType} from "mongoose";
+import { UserDocument } from "./user";
+
 
 export interface postDocument extends Document{
-    userId:ObjectId;
+    userId:UserDocument;
     location:string;
     description:string;
     imageUrl:string[];
@@ -36,7 +38,7 @@ const postSchema:Schema<postDocument> = new Schema({
         type:Boolean,
         default:false
     }
-})
+},{timestamps:true})
 
 const Post = mongoose.model('Post',postSchema)
 

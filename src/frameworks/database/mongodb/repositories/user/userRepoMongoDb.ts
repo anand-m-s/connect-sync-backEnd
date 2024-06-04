@@ -1,7 +1,8 @@
-import { userRegisterInterface } from "../../../../types/userRegisterInterface";
-import User, { UserDocument } from "../models/user";
-import { checkExistingUser, checkUserName } from "../utils/userChecker";
+import { userRegisterInterface } from "../../../../../types/user/userRegisterInterface";
+import User, { UserDocument } from "../../models/user";
+import { checkExistingUser} from "../../utils/userChecker";
 import bcrypt from 'bcrypt'
+import Connection from "../../models/connections";
 
 
 export const saveUser = async (data: userRegisterInterface) => {
@@ -56,50 +57,26 @@ export const saveUserGoogle = async (data: userRegisterInterface) => {
             email: data.email,
             password: hashedPassword,
             isGoogle: true,
+            profilePic: data.profilePic,
         })
+        await Connection.create({
+            userId: newUser._id
+        })
+
         return newUser
     } catch (error) {
         throw new Error((error as Error).message);
     }
 }
-export const updateProfile = async (data: UserDocument) => {
+
+export const updatePassword=async(password:string,email:string)=>{
     try {
-        const existingUser = await checkUserName(data.userName, data.id)
-        if (existingUser) {         
-                existingUser.bio = data.bio || '',
-                    existingUser.userName = data.userName,
-                    existingUser.phone = data.phone || '',
-                    existingUser.profilePic = data.profilePic?data.profilePic:existingUser.profilePic
-                    await existingUser?.save()
-                return existingUser       
-        } else {
-            throw new Error('Another user have the same username try another one :)')
-        }
+        console.log(password,email)
+        const user:any = await User.findOne({email})
+        user.password = password
+        await user.save()   
+        return { message: 'Password updated successfully' };     
     } catch (error) {
         throw new Error((error as Error).message);
-
-    }
-}
-
-export const getUserDetails = async (data: { id: string }) => {
-    try {
-        console.log('inside mongo db repo')
-        const user = await User.findById(data.id)
-        if (user) {
-            let data = {
-                id: user.id,
-                userName: user.userName,
-                bio: user.bio,
-                phone: user.phone,
-                profiePic:user.profilePic
-            }
-            return data
-        } else {
-            throw new Error('user not found')
-        }
-
-    } catch (error) {
-        throw new Error((error as Error).message);
-
     }
 }

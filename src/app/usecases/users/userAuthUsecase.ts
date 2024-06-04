@@ -1,6 +1,6 @@
-import { userRegisterInterface } from "../../../types/userRegisterInterface"
-import { getUserDetails, saveUser,saveUserGoogle, updateProfile } from "../../../frameworks/database/mongodb/repositories/userRepoMongoDb"
-import { verifyUser } from "../../../frameworks/database/mongodb/repositories/user/isVerified"
+import { userRegisterInterface } from "../../../types/user/userRegisterInterface"
+import {saveUser,saveUserGoogle,updatePassword} from "../../../frameworks/database/mongodb/repositories/user/userRepoMongoDb"
+import { forgotPassword, verifyUser } from "../../../frameworks/database/mongodb/repositories/user/isVerified"
 import { generateToken } from "../../utils/generateToken"
 import { UserDocument } from "../../../frameworks/database/mongodb/models/user"
 import { getUser } from "../../../frameworks/database/mongodb/repositories/user/getUser"
@@ -70,7 +70,8 @@ export default {
                 const user = {
                     id: savedUser._id,
                     email: savedUser.email,
-                    userName: savedUser.userName
+                    userName: savedUser.userName,
+                                       
                 }
                 let token = generateToken(user.id)
                 return {user,token}
@@ -79,35 +80,24 @@ export default {
             throw new Error((error as Error).message)
         }
     },
-    updateProfileUseCase:async(data:UserDocument)=>{
+    forgotPassword:async(email:string)=>{
         try {
-            const user = await updateProfile(data)
-           console.log(user!)
-            if (user) {
-                const updatedUser = {
-                    userName:user.userName,
-                    phone:user.phone,
-                    bio:user.bio,
-                    profilePic:user.profilePic
-                }
-                return {message:'user profile updated',updatedUser}
-            } else {
-                throw new Error('User not found');
-            }
-
+           return await forgotPassword(email)
         } catch (error) {
-            throw new Error((error as Error).message)            
+            throw new Error((error as Error).message)
         }
     },
-    getUserDetails:async(data:{id:string})=>{
+    updatePassword:async(password:string,email:string)=>{
         try {
-            console.log('inside getUserDetails')
-            return await getUserDetails(data)
-
+            console.log('inside usecase')
+            console.log(email)
+            console.log(password)
+            return await updatePassword(password,email)
         } catch (error) {
+            throw new Error((error as Error).message)
             
-            throw new Error((error as Error).message)            
         }
     }
+
     
 }

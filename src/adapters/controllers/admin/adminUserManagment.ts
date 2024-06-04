@@ -17,8 +17,9 @@ export const adminUserManagment = {
             if (typeof userId !== 'string') {
                 throw new Error('Invalid userId');
             }
-            await adminUserUsecases.blockUser(userId)
-            res.json({message:'success'})
+            const status = await adminUserUsecases.blockUser(userId)
+            console.log(status!)
+            res.json({message:status})
         } catch (error) {
             res.status(500).json({error:(error as Error).message})
         }
