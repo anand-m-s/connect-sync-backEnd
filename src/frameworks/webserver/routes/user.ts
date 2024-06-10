@@ -21,3 +21,7 @@ userRouter.post('/followToggle', protectUser, userProfileController.followToggle
 userRouter.get('/userFeedPost', protectUser, userPostController.userFeedPost)
 userRouter.delete('/deletePost/:postId', protectUser, userPostController.deletePost)
 userRouter.put('/editPost', protectUser, userPostController.editPost)
+userRouter.get('/following',protectUser,userProfileController.followingData)
+userRouter.get('/fetchAllComments',protectUser,userPostController.allComments)
+userRouter.post('/AddComment',protectUser,userPostController.addComment)
+userRouter.post('/addReply',protectUser,userPostController.addReply)

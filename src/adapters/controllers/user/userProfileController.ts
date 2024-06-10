@@ -56,5 +56,17 @@ export default{
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })            
         }
+    },
+    followingData: async (req: Request, res: Response) => {
+        try {
+            const userId = req.query.userId as string
+            console.log(userId)            
+            const data =await userProfileUseCase.followingUseCase(userId)
+            console.log({data})
+            res.status(200).json({data})
+            
+        } catch (error) {
+            res.status(500).json({ error: (error as Error).message })
+        }
     }
 }

@@ -1,7 +1,7 @@
 
-import { PostData } from "../../../../types/user/common"
+import { PostData, replyData } from "../../../../types/user/post"
 import { postRepo } from "../../../../frameworks/database/mongodb/repositories/user/postRepo"
-
+import { commentData } from "../../../../types/user/post"
 
 export default {
     userPostSave: async (data: PostData) => {
@@ -46,15 +46,39 @@ export default {
 
         }
     },
-    editPostUseCase: async (data:PostData) => {
+    editPostUseCase: async (data: PostData) => {
         try {
             console.log(data)
             return await postRepo.editPost(data)
-            
+
         } catch (error) {
             throw new Error((error as Error).message)
 
         }
     },
+    getAllComments: async (postId: string) => {
+        try {
+            console.log(postId)
+            return await postRepo.getAllComments(postId)
+
+        } catch (error) {
+            throw new Error((error as Error).message)
+
+        }
+    },
+    addCommentUseCase: async (data: commentData) => {
+        try {
+            return await postRepo.addCommentRepo(data)
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    },
+    replyUseCase: async (data: replyData) => {
+        try {
+            return await postRepo.addReply(data)
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    }
 
 }

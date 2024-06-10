@@ -48,7 +48,14 @@ export default {
         } catch (error) {
             throw new Error((error as Error).message)
         }
-
+        
+    },
+    fetchAllMessages:async(chatId:string)=>{
+        try {
+            return await chatRepo.fetchAllMessagesRepo(chatId)
+        } catch (error) {            
+            throw new Error((error as Error).message)
+        }
     }
 
 

@@ -50,6 +50,16 @@ export default {
             return await connection.toggleFollow(userId,userIdToToggle)
         } catch (error) {
             throw new Error((error as Error).message)
+            }
+            },
+    followingUseCase:async(userId:string)=>{
+        try {
+            const data =  await connection.followingRepo(userId)
+            console.log('followers and following',data)
+            return data 
+            
+        } catch (error) {            
+            throw new Error((error as Error).message)
         }
     }
 }

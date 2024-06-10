@@ -55,7 +55,15 @@ export default {
         } catch (error) {            
             res.status(500).json({ error: (error as Error).message })
         }
+    },
+    fetchAllMessages:async(req:Request,res:Response)=>{
+        try {
+            const {chatId}= req.params
+            const messages = await chatUseCase.fetchAllMessages(chatId)
+          
+            res.json(messages)
+        } catch (error) {            
+            res.status(500).json({ error: (error as Error).message })
+        }
     }
-
-
 }

@@ -18,6 +18,9 @@ export const getUser = {
             const user = await User.findById(id)
             // console.log({user})
             const isFollow = await Connection.findOne({userId:current})
+            const connectionData = await Connection.findOne({userId:id})
+            console.log(connectionData?.followers.length,'connectionData')
+            console.log(connectionData?.following.length,'connectionData')
             // console.log({isFollow})
             if (user) {
                 const isFollowing : Boolean|null= isFollow && isFollow.following.includes(user._id)
@@ -28,7 +31,9 @@ export const getUser = {
                     bio: user.bio,
                     phone: user.phone,
                     profilePic: user.profilePic,
-                    isFollowing:isFollowing
+                    isFollowing:isFollowing,
+                    following:connectionData?.followers.length,
+                    followers:connectionData?.following.length
                 }
                 return data
             } else {

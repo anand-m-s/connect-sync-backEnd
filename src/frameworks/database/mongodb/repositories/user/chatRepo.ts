@@ -17,7 +17,7 @@ const chatRepo = {
                 path: "latestMessage.sender",
                 select: "userName profilepic email",
             });
-            console.log(results)
+        
             return results;
 
         } catch (error) {
@@ -42,7 +42,7 @@ const chatRepo = {
                 path: "latestMessage.sender",
                 select: "userName profilePic email",
             });
-            console.log({ isChat })
+           
             return isChat;
         } catch (error) {
             throw new Error((error as Error).message)
@@ -69,18 +69,28 @@ const chatRepo = {
     sendMessage: async (data: messageInterface) => {
         try {
             console.log(data)
-            let message:any = await Message.create(data);
+            let message: any = await Message.create(data);
             await message.populate([
                 { path: 'sender', select: 'userName profilePic' },
                 { path: 'chat' },
-              ])
-             message = await User.populate(message, {
+            ])
+            message = await User.populate(message, {
                 path: "chat.users",
                 select: "name pic email",
-              });
+            });
             await Chat.findByIdAndUpdate(data.chat, { latestMessage: message });
             console.log(message)
             return message;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    },
+    fetchAllMessagesRepo: async (chatId: string) => {
+        try {
+            const messages = await Message.find({chat:chatId})
+            .populate('sender','userName profilePic email')
+            .populate('chat')
+            return messages
         } catch (error) {
             throw new Error((error as Error).message);
         }
