@@ -9,12 +9,28 @@ export const adminUserUsecases = {
             throw new Error((error as Error).message);
         }
     },
-    blockUser:async(userId:string)=>{
+    blockUser: async (userId: string) => {
         try {
-             const status = await adminRepo.blockUser(userId)
-             return status
+            const status = await adminRepo.blockUser(userId)
+            return status
         } catch (error) {
             throw new Error((error as Error).message);
         }
-    }
+    },
+    getReportUseCase: async () => {
+        try {
+            return await adminRepo.getReportRepo()
+        } catch (error) {
+            throw new Error((error as Error).message);
+
+        }
+    },
+    blockPostUseCase:async (postId:string) => {
+        try {
+            return await adminRepo.blockPostRepo(postId)
+        } catch (error) {
+            throw new Error((error as Error).message);
+
+        }
+    },
 };

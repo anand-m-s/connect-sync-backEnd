@@ -21,4 +21,10 @@ export interface replyData{
   reply:string;
   parentId:string;
 }
-  
+export interface reportData{
+
+  postId:string;
+  userId:any;
+  reason:string;
+  additionalReason:string;
+}

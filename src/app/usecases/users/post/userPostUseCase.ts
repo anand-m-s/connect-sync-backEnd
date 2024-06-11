@@ -1,5 +1,5 @@
 
-import { PostData, replyData } from "../../../../types/user/post"
+import { PostData, replyData, reportData } from "../../../../types/user/post"
 import { postRepo } from "../../../../frameworks/database/mongodb/repositories/user/postRepo"
 import { commentData } from "../../../../types/user/post"
 
@@ -35,7 +35,6 @@ export default {
             })
         } catch (error) {
             throw new Error((error as Error).message)
-
         }
     },
     deletePostUseCase: async (postId: string) => {
@@ -77,6 +76,31 @@ export default {
         try {
             return await postRepo.addReply(data)
         } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    },
+    likePost: async (userId: string, postId: string) => {
+        try {
+            return await postRepo.likePost(userId, postId)
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    },
+    likeStatusUseCase: async (postId: string, userId: string) => {
+        try {
+            return await postRepo.likeStatusRepo(postId, userId)
+
+        } catch (error) {
+
+            throw new Error((error as Error).message)
+        }
+    },
+    reportUseCase: async (data: reportData) => {
+        try {   
+            console.log('inside use case')
+            return await postRepo.reportRepo(data);
+        } catch (error) {
+
             throw new Error((error as Error).message)
         }
     }

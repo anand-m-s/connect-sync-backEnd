@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 import Connection from "../../models/connections";
 
 
-export const saveUser = async (data: userRegisterInterface) => {
+export const    saveUser = async (data: userRegisterInterface) => {
     try {
 
         const existingUser = await checkExistingUser(data.email, data.userName)

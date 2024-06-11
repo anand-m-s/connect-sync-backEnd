@@ -7,7 +7,7 @@ import { cleanupSessionData } from "../../../utils/sessionCleanUp"
 import { expiryCheck } from "../../../utils/otpExpireCheck";
 
 export default {
-    registerUser: async (req: Request, res: Response) => {
+        registerUser: async (req: Request, res: Response) => {
         try {
             const { email, userName } = req.body
             console.log(email, userName)
