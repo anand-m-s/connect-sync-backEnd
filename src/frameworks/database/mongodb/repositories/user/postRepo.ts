@@ -22,11 +22,13 @@ export const postRepo = {
         }
 
     },
-    getUsersPost: async () => {
+    getUsersPost: async (perPage: number, page: number) => {
         try {
-            return await Post.find({isBlocked:false})
+            return await Post.find({ isBlocked: false })
                 .populate('userId', 'userName profilePic')
                 .sort({ createdAt: -1 })
+                .skip((page - 1) * perPage)
+                .limit(perPage);
         } catch (error) {
             throw new Error((error as Error).message)
         }
@@ -53,7 +55,7 @@ export const postRepo = {
     },
     getAllComments: async (postId: string) => {
         try {
-            console.log('inside getAllcomments repo');
+
             const comments: any = await Comment.find({ postId })
                 .populate('userId', 'userName profilePic')
                 .lean();
@@ -174,31 +176,31 @@ export const postRepo = {
         }
     },
     reportRepo: async (data: reportData) => {
-        const {postId,userId,reason,additionalReason} = data
-        try {   
+        const { postId, userId, reason, additionalReason } = data
+        try {
             console.log('inside repo')
             console.log(data)
-            const report = await Report.findOne({postId})
+            const report = await Report.findOne({ postId })
             if (!report) {
                 await Report.create({
                     postId,
                     users: [{ userId, reason, additionalReason }],
-                    });
-                    return 'reported'
-                    } else {
-                 
+                });
+                return 'reported'
+            } else {
+
                 const userReport = report.users.find(user => user.userId.toString() === userId);
-          
+
                 if (userReport) {
-                //   userReport.reason = reason;
-                //   userReport.additionalReason = additionalReason;
-                return 'already reported'
+                    //   userReport.reason = reason;
+                    //   userReport.additionalReason = additionalReason;
+                    return 'already reported'
                 } else {
-                  report.users.push({ userId, reason, additionalReason });
-                }          
+                    report.users.push({ userId, reason, additionalReason });
+                }
                 await report.save();
                 return 'Report submitted successfully'
-              }
+            }
         } catch (error) {
             throw new Error((error as Error).message);
 

@@ -20,6 +20,7 @@ export default{
             res.status(500).json({ error: (error as Error).message })
         }
     },
+    
     updateProfile: async (req: Request, res: Response) => {
         console.log(req.body)
         try {

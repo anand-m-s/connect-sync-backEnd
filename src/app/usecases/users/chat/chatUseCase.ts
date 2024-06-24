@@ -6,7 +6,7 @@ export default {
 
     fetchAllChats: async (userId: string) => {
         try {
-            console.log('inside fetchAllChats useCase controller')
+           
             return await chatRepo.fetchAllChats(userId)
         } catch (error) {
             throw new Error((error as Error).message)
@@ -15,8 +15,8 @@ export default {
 
     },
     accessChat: async (userId: string, otherUserId: string) => {
-        console.log('inside access chat usecase')
-        console.log(userId, otherUserId)
+ 
+    
 
         if (!otherUserId) {
             throw new Error("UserId param not sent with request");
@@ -45,6 +45,15 @@ export default {
         try {
             console.log(data)
             return await chatRepo.sendMessage(data)
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+        
+    },
+    sendFilesUsecase: async (data: messageInterface) => {
+        try {
+          
+            return await chatRepo.sendFilesRepo(data)
         } catch (error) {
             throw new Error((error as Error).message)
         }

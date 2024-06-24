@@ -52,7 +52,6 @@ const userSchema = new mongoose_1.Schema({
     },
     phone: {
         type: String,
-        required: true
     },
     isBlocked: {
         type: Boolean,
@@ -61,6 +60,15 @@ const userSchema = new mongoose_1.Schema({
     isVerified: {
         type: Boolean,
         default: false
+    },
+    isGoogle: {
+        type: Boolean,
+        default: false
+    }, profilePic: {
+        type: String
+    },
+    bio: {
+        type: String
     }
 }, {
     timestamps: true

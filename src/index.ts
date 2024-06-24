@@ -1,13 +1,14 @@
 import express from "express"
 import connectDB from "./frameworks/database/mongodb/connection"
-import serverConfig from "./frameworks/webserver/server"
-import expressConfig from "./frameworks/webserver/express"
+import serverConfig from "./frameworks/webserver/config/server"
+import expressConfig from "./frameworks/webserver/config/express"
 import { userRouter } from './frameworks/webserver/routes/user'
 import { adminRouter } from "./frameworks/webserver/routes/admin"
 import { chatRouter } from "./frameworks/webserver/routes/chat"
 import http from "http"
 import colors from 'colors.ts'
 import { Server } from "socket.io"
+
 
 colors?.enable()
 
@@ -21,17 +22,46 @@ const io = new Server(server, {
     },
 });
 
+type UserData = {
+    id: string;
+    userName?: string;
+    email?: string;
+};
+
+declare module "socket.io" {
+    interface Socket {
+        userData?: UserData;
+    }
+}
+
 io.on("connection", (socket) => {
-    console.log('connected to socket.io')
     socket.on('setup', (userData) => {
+  
+        console.log(userData)
         socket.join(userData.id)
-        socket.emit('connected')
+        socket.userData = userData;
+        // socket.emit('connected')
+        socket.emit('connected', { socketId: socket.id })
     })
 
     socket.on('join chat', (room) => {
         socket.join(room)
         console.log('user joined room : ', room)
     })
+
+    socket.on('join video chat', ({ roomId}) => {
+        socket.join(roomId);
+        console.log(` joined video chat room: ${roomId}`);
+    });
+    socket.on('video-call', ({ roomId, callerId, recipientId }) => {
+        console.log('inside video =- call')
+        console.log(roomId)
+        console.log(callerId)
+        console.log(recipientId,'recipientId')
+        socket.join(roomId);
+        socket.to(recipientId).emit('video-call', { roomId, callerId });
+        console.log(`user ${callerId} initiated video call to ${recipientId} in room: ${roomId}`);
+    });
 
     socket.on('new message', (newMessageRecieved) => {
         let chat = newMessageRecieved.chat;
@@ -42,8 +72,30 @@ io.on("connection", (socket) => {
         });
     })
 
-    socket.on("typing",(room)=>socket.in(room).emit("typing"));
-    socket.on('stop typing',(room)=>socket.in(room).emit("stop typing"))
+    socket.on("typing", (room) => socket.in(room).emit("typing"));
+    socket.on('stop typing', (room) => socket.in(room).emit("stop typing"))
+
+
+     // Handle WebRTC signaling messages
+     socket.on('webrtc-offer', (data) => {
+        // console.log(data)
+        socket.to(data.roomId).emit('webrtc-offer', data);
+      });
+    
+      socket.on('webrtc-answer', (data) => {
+        socket.to(data.roomId).emit('webrtc-answer', data);
+      });
+    
+      socket.on('webrtc-ice-candidate', (data) => {
+        socket.to(data.roomId).emit('webrtc-ice-candidate', data);
+      });        
+
+    // socket.on("disconnect", () => {
+    //     console.log("USER DISCONNECTED");
+    //     if (socket.userData && socket.userData.id) {
+    //         socket.leave(socket.userData.id);
+    //     }
+    // });
 })
 
 connectDB()

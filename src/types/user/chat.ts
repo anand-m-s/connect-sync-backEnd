@@ -11,5 +11,6 @@ export interface messageInterface {
   sender:string;
   content:string;
   chat:string;
+  files:string[]
 }
 

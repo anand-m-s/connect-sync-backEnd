@@ -25,9 +25,12 @@ export default {
             throw new Error((error as Error).message)
         }
     },
-    userFeedPost: async () => {
+    userFeedPost: async (perPage:string,page:string) => {
         try {
-            const posts = await postRepo.getUsersPost()
+            const perPageNum = parseInt(perPage, 10);
+            const pageNum = parseInt(page, 10);
+            const posts = await postRepo.getUsersPost(perPageNum,pageNum)
+            // console.log({posts})
             return posts.map(post => {
                 const { _id, userId, imageUrl, location, description } = post;
                 const { userName, profilePic } = userId
@@ -57,7 +60,7 @@ export default {
     },
     getAllComments: async (postId: string) => {
         try {
-            console.log(postId)
+         
             return await postRepo.getAllComments(postId)
 
         } catch (error) {

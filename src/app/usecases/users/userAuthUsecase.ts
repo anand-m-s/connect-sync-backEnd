@@ -65,7 +65,7 @@ export default {
     googleAuthUseCase:async(data:userRegisterInterface)=>{
         try {
             const savedUser = await saveUserGoogle(data)
-            console.log({savedUser})
+          
             if(savedUser){
                 const user = {
                     id: savedUser._id,

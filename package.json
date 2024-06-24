@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.400.0",
+    "@aws-sdk/s3-request-presigner": "^3.400.0",
     "@types/express-session": "^1.18.0",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/nodemailer": "^6.4.15",

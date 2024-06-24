@@ -7,7 +7,7 @@ const chatRepo = {
 
     fetchAllChats: async (userId: string) => {
         try {
-            console.log('inside fetchAllChats controller repo')
+      
             let results: any = await Chat.find({ users: { $elemMatch: { $eq: userId } } })
                 .populate("users", "-password")
                 .populate('latestMessage')
@@ -26,7 +26,7 @@ const chatRepo = {
     },
     findChatBetweenUsers: async (userId: string, otherUserId: string) => {
         try {
-            console.log('inside access chat usecase repo')
+         
 
             let isChat = await Chat.find({
                 isGroupChat: false,
@@ -67,8 +67,7 @@ const chatRepo = {
         }
     },
     sendMessage: async (data: messageInterface) => {
-        try {
-            console.log(data)
+        try {            
             let message: any = await Message.create(data);
             await message.populate([
                 { path: 'sender', select: 'userName profilePic' },
@@ -76,10 +75,27 @@ const chatRepo = {
             ])
             message = await User.populate(message, {
                 path: "chat.users",
-                select: "name pic email",
+                select: "userName profilePic email",
             });
-            await Chat.findByIdAndUpdate(data.chat, { latestMessage: message });
-            console.log(message)
+            await Chat.findByIdAndUpdate(data.chat, { latestMessage: message });            
+            return message;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    },
+    sendFilesRepo: async (data: messageInterface) => {
+        try {            
+            console.log({data})
+            let message: any = await Message.create(data);
+            await message.populate([
+                { path: 'sender', select: 'userName profilePic' },
+                { path: 'chat' },
+            ])
+            message = await User.populate(message, {
+                path: "chat.users",
+                select: "userName profilePic email",
+            });
+            await Chat.findByIdAndUpdate(data.chat, { latestMessage: message });            
             return message;
         } catch (error) {
             throw new Error((error as Error).message);

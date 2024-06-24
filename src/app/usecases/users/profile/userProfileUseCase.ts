@@ -13,6 +13,7 @@ export default {
             throw new Error((error as Error).message)
         }
     },
+    
     updateProfileUseCase: async (data: UserDocument) => {
         try {
             const user = await getUser.updateProfile(data)
