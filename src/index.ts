@@ -34,14 +34,16 @@ declare module "socket.io" {
     }
 }
 
+const onlineUsers = new Map();
+
 io.on("connection", (socket) => {
     socket.on('setup', (userData) => {
-  
-        console.log(userData)
+        // console.log(userData)
         socket.join(userData.id)
         socket.userData = userData;
-        // socket.emit('connected')
-        socket.emit('connected', { socketId: socket.id })
+        onlineUsers.set(userData.id, userData);
+        io.emit('user-connected', { userId: userData.id, userName: userData.userName,profilePic:userData.profilePic });
+        socket.emit('connected', { socketId: socket.id });
     })
 
     socket.on('join chat', (room) => {
@@ -76,7 +78,7 @@ io.on("connection", (socket) => {
     socket.on('stop typing', (room) => socket.in(room).emit("stop typing"))
 
 
-     // Handle WebRTC signaling messages
+     //============ Handle WebRTC signaling messages=============
      socket.on('webrtc-offer', (data) => {
         // console.log(data)
         socket.to(data.roomId).emit('webrtc-offer', data);
@@ -88,14 +90,22 @@ io.on("connection", (socket) => {
     
       socket.on('webrtc-ice-candidate', (data) => {
         socket.to(data.roomId).emit('webrtc-ice-candidate', data);
-      });        
+      });     
+      
+      socket.on('user-disconnected', (data) => {        
+        console.log(`USER DISCONNECTED: ${data.userId}`);
+        onlineUsers.delete(data.userId);
+        io.emit('user-disconnected', data);
+    });
 
-    // socket.on("disconnect", () => {
-    //     console.log("USER DISCONNECTED");
-    //     if (socket.userData && socket.userData.id) {
-    //         socket.leave(socket.userData.id);
-    //     }
-    // });
+    socket.on("disconnect", () => {
+        console.log("USER DISCONNECTED");
+        if (socket.userData && socket.userData.id) {
+            onlineUsers.delete(socket.userData.id);
+            io.emit('user-disconnected', { userId: socket.userData.id });
+            socket.leave(socket.userData.id);
+        }
+    });
 })
 
 connectDB()

@@ -25,7 +25,7 @@ export default {
             throw new Error((error as Error).message)
         }
     },
-    userFeedPost: async (perPage:string,page:string) => {
+    userFeedPost: async (perPage: string, page: string) => {
         try {
             // const perPageNum = parseInt(perPage, 10);
             // const pageNum = parseInt(page, 10);
@@ -39,16 +39,14 @@ export default {
             const perPageNum = parseInt(perPage, 10);
             const pageNum = parseInt(page, 10);
             const posts = await postRepo.getUsersPost(perPageNum, pageNum);
-    
+            // console.log(posts)  
             const enrichedPosts = await Promise.all(posts.map(async post => {
-                const { _id, userId, imageUrl, location, description, likes } = post;
-                const { userName, profilePic } = userId;
-    
+                const { _id, users, imageUrl, location, description, likes } = post;
+                const { userName, profilePic } = users;
                 const comments = await postRepo.getAllComments(_id);
-    
                 return {
                     _id,
-                    userId: userId._id,
+                    userId: users._id,
                     userName,
                     profilePic,
                     imageUrl,
@@ -60,7 +58,7 @@ export default {
                     comments
                 };
             }));
-    
+
             return enrichedPosts;
         } catch (error) {
             throw new Error((error as Error).message)
@@ -86,7 +84,7 @@ export default {
     },
     getAllComments: async (postId: string) => {
         try {
-         
+
             return await postRepo.getAllComments(postId)
 
         } catch (error) {
@@ -125,7 +123,7 @@ export default {
         }
     },
     reportUseCase: async (data: reportData) => {
-        try {   
+        try {
             console.log('inside use case')
             return await postRepo.reportRepo(data);
         } catch (error) {

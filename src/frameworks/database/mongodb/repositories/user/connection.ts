@@ -40,10 +40,9 @@ export const connection = {
     },
     followingRepo: async (userId: string) => {
         try {
-            let data:any = await Connection.findOne({ userId })
-            .populate('followers','userName profilePic _id')
-            .populate('following','userName profilePic _id')
-            console.log(data,'following repo')
+            let data: any = await Connection.findOne({ userId })
+                .populate('followers', 'userName profilePic _id')
+                .populate('following', 'userName profilePic _id')
             return data
         } catch (error) {
             throw new Error((error as Error).message)

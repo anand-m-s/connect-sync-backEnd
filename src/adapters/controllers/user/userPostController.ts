@@ -29,7 +29,8 @@ export default {
         try {
             const perPage = req.query.perPage as string;
             const page = req.query.page as string;
-            res.status(200).json(await userPostUseCase.userFeedPost(perPage,page))
+            console.log(page)
+            res.status(200).json(await userPostUseCase.userFeedPost(perPage, page))
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
@@ -84,7 +85,6 @@ export default {
         try {
             const userId = req.user.userId
             const postId = req.query.postId as string;
-            console.log(userId, postId)
             const { action, likeCount } = await userPostUseCase.likePost(userId, postId)
             res.status(200).json({ action, likeCount })
         } catch (error) {
@@ -108,7 +108,7 @@ export default {
         try {
             const userId = req.user.userId; // assuming `req.user` is populated by `protectUser` middleware
             const { postId, reason, additionalReason } = req.body;
-            const data  ={
+            const data = {
                 postId,
                 reason,
                 additionalReason,
@@ -116,7 +116,7 @@ export default {
             }
             console.log(data)
             const report = await userPostUseCase.reportUseCase(data);
-            console.log(report)        
+            console.log(report)
             res.status(200).json({ message: report });
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })

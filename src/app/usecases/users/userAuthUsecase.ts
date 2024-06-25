@@ -71,6 +71,7 @@ export default {
                     id: savedUser._id,
                     email: savedUser.email,
                     userName: savedUser.userName,
+                    profilePic:savedUser.profilePic
                                        
                 }
                 let token = generateToken(user.id)

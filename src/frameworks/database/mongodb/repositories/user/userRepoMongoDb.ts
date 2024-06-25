@@ -5,7 +5,7 @@ import bcrypt from 'bcrypt'
 import Connection from "../../models/connections";
 
 
-export const    saveUser = async (data: userRegisterInterface) => {
+export const saveUser = async (data: userRegisterInterface) => {
     try {
 
         const existingUser = await checkExistingUser(data.email, data.userName)
@@ -39,11 +39,12 @@ export const saveUserGoogle = async (data: userRegisterInterface) => {
             throw new Error('user Blocked')
         }
         if (existingUser) {
-            if (existingUser.isGoogle) {
+            if (existingUser.isGoogle) {                
                 let user = {
                     _id: existingUser.id,
                     email: existingUser.email,
                     userName: existingUser.userName,
+                    profilePic:existingUser.profilePic
                 }
                 return user
             } else {

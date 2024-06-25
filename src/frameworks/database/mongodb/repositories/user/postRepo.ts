@@ -45,10 +45,10 @@ export const postRepo = {
                         from: 'users',
                         localField: 'userId',
                         foreignField: '_id',
-                        as: 'userId'
+                        as: 'users'
                     }
                 },
-                { $unwind: "$userId" },
+                { $unwind: "$users" },
                 {
                     $lookup: {
                         from: 'likes',
@@ -60,7 +60,7 @@ export const postRepo = {
                 {
                     $project: {
                         _id: 1,
-                        userId: {
+                        users: {
                             _id: 1,
                             userName: 1,
                             profilePic: 1
@@ -182,10 +182,9 @@ export const postRepo = {
                 }
 
             }
-            // Re-fetch to get the latest count ========
+            // Re-fetch to get the latest count ==========
             const likes: any = await Like.findOne({ postId });
             const likeCount: number = likes.likedUsers.length;
-            console.log({ likeCount });
             return { action, likeCount };
         } catch (error) {
             console.error('Error in likePost:', error);

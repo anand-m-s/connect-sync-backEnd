@@ -1,6 +1,6 @@
 import User, { UserDocument } from "../../models/user";
 import { checkUserName } from "../../utils/userChecker";
-import Connection,{connectionDocument} from "../../models/connections";
+import Connection, { connectionDocument } from "../../models/connections";
 
 export const getUser = {
     getUserByEmail: async (email: string) => {
@@ -10,30 +10,26 @@ export const getUser = {
             throw new Error((error as Error).message)
         }
     },
-    getUserDetails: async (id: string,current:string) => {
+    getUserDetails: async (id: string, current: string) => {
         try {
-            console.log('inside mongo db repo get userdetails' )
-            console.log({id})
-            console.log({current})
+
             const user = await User.findById(id)
             // console.log({user})
-            const isFollow = await Connection.findOne({userId:current})
-            const connectionData = await Connection.findOne({userId:id})
-            console.log(connectionData?.followers.length,'connectionData')
-            console.log(connectionData?.following.length,'connectionData')
+            const isFollow = await Connection.findOne({ userId: current })
+            const connectionData = await Connection.findOne({ userId: id })
+
             // console.log({isFollow})
             if (user) {
-                const isFollowing : Boolean|null= isFollow && isFollow.following.includes(user._id)
-                console.log(isFollowing)                
+                const isFollowing: Boolean | null = isFollow && isFollow.following.includes(user._id)
                 let data = {
                     id: user.id,
                     userName: user.userName,
                     bio: user.bio,
                     phone: user.phone,
                     profilePic: user.profilePic,
-                    isFollowing:isFollowing,
-                    following:connectionData?.followers.length,
-                    followers:connectionData?.following.length
+                    isFollowing: isFollowing,
+                    following: connectionData?.followers.length,
+                    followers: connectionData?.following.length
                 }
                 return data
             } else {

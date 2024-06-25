@@ -57,8 +57,7 @@ export default {
     loginUser: async (req: Request, res: Response) => {
         try {
             const { email, password } = req.body
-            const { user, token } = await userAuthUsecase.loginUser(email, password)
-            console.log({ user })
+            const { user, token } = await userAuthUsecase.loginUser(email, password)           
             res.status(200).json({
                 message: 'login successfull!',
                 user, token
@@ -68,8 +67,7 @@ export default {
         }
     },
     googleAuth: async (req: Request, res: Response) => {
-        try {
-            console.log(req.body)
+        try {           
             const user = await userAuthUsecase.googleAuthUseCase(req.body)
             res.status(200).json({ message: "User registered successfully", user: user?.user, token: user?.token });
         } catch (error) {
