@@ -27,15 +27,41 @@ export default {
     },
     userFeedPost: async (perPage:string,page:string) => {
         try {
+            // const perPageNum = parseInt(perPage, 10);
+            // const pageNum = parseInt(page, 10);
+            // const posts = await postRepo.getUsersPost(perPageNum,pageNum)
+            // // console.log({posts})
+            // return posts.map(post => {
+            //     const { _id, userId, imageUrl, location, description } = post;
+            //     const { userName, profilePic } = userId
+            //     return { _id, userId: userId._id, userName, profilePic, imageUrl, location, description };
+            // })
             const perPageNum = parseInt(perPage, 10);
             const pageNum = parseInt(page, 10);
-            const posts = await postRepo.getUsersPost(perPageNum,pageNum)
-            // console.log({posts})
-            return posts.map(post => {
-                const { _id, userId, imageUrl, location, description } = post;
-                const { userName, profilePic } = userId
-                return { _id, userId: userId._id, userName, profilePic, imageUrl, location, description };
-            })
+            const posts = await postRepo.getUsersPost(perPageNum, pageNum);
+    
+            const enrichedPosts = await Promise.all(posts.map(async post => {
+                const { _id, userId, imageUrl, location, description, likes } = post;
+                const { userName, profilePic } = userId;
+    
+                const comments = await postRepo.getAllComments(_id);
+    
+                return {
+                    _id,
+                    userId: userId._id,
+                    userName,
+                    profilePic,
+                    imageUrl,
+                    location,
+                    description,
+                    likesCount: likes.length,
+                    commentsCount: comments.length,
+                    likedUsers: likes.map((like: { likedUsers: any }) => like.likedUsers).flat(),
+                    comments
+                };
+            }));
+    
+            return enrichedPosts;
         } catch (error) {
             throw new Error((error as Error).message)
         }

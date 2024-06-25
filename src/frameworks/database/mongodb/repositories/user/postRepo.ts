@@ -22,15 +22,59 @@ export const postRepo = {
         }
 
     },
+    // getUsersPost: async (perPage: number, page: number) => {
+    //     try {
+    //         return await Post.find({ isBlocked: false })
+    //             .populate('userId', 'userName profilePic')
+    //             .sort({ createdAt: -1 })
+    //             .skip((page - 1) * perPage)
+    //             .limit(perPage);
+    //     } catch (error) {
+    //         throw new Error((error as Error).message)
+    //     }
+    // },
     getUsersPost: async (perPage: number, page: number) => {
         try {
-            return await Post.find({ isBlocked: false })
-                .populate('userId', 'userName profilePic')
-                .sort({ createdAt: -1 })
-                .skip((page - 1) * perPage)
-                .limit(perPage);
+            return await Post.aggregate([
+                { $match: { isBlocked: false } },
+                { $sort: { createdAt: -1 } },
+                { $skip: (page - 1) * perPage },
+                { $limit: perPage },
+                {
+                    $lookup: {
+                        from: 'users',
+                        localField: 'userId',
+                        foreignField: '_id',
+                        as: 'userId'
+                    }
+                },
+                { $unwind: "$userId" },
+                {
+                    $lookup: {
+                        from: 'likes',
+                        localField: '_id',
+                        foreignField: 'postId',
+                        as: 'likes'
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        userId: {
+                            _id: 1,
+                            userName: 1,
+                            profilePic: 1
+                        },
+                        imageUrl: 1,
+                        location: 1,
+                        description: 1,
+                        likes: 1,
+                        createdAt: 1
+                    }
+                }
+            ]);
         } catch (error) {
-            throw new Error((error as Error).message)
+            throw new Error((error as Error).message);
         }
     },
     deletePost: async (postId: string) => {
@@ -94,7 +138,6 @@ export const postRepo = {
             })
             newComment.save()
             return
-
         } catch (error) {
             throw new Error((error as Error).message);
         }
