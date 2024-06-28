@@ -13,8 +13,12 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-            req.admin = decoded
-            next()
+            req.admin = decoded          
+            if (req.admin.role == 'admina') {
+                next()
+            } else {
+                res.status(403).json({ message: 'Forbidden: Admins only' });
+            }
         } catch (error) {
             res.status(401)
             throw new Error("Not authorized Invalid token")

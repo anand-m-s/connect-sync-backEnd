@@ -99,6 +99,14 @@ export default {
             throw new Error((error as Error).message)
         }
     },
+    getComment:async(postId:string)=>{
+        try {
+            return await postRepo.getAllComments(postId)
+            
+        } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    },
     replyUseCase: async (data: replyData) => {
         try {
             return await postRepo.addReply(data)

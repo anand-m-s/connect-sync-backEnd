@@ -100,7 +100,7 @@ export const postRepo = {
     getAllComments: async (postId: string) => {
         try {
 
-            const comments: any = await Comment.find({ postId })
+            const comments : any = await Comment.find({ postId })
                 .populate('userId', 'userName profilePic')
                 .lean();
 
@@ -111,6 +111,14 @@ export const postRepo = {
             // console.log(comments);
             return comments
         } catch (error) {
+            throw new Error((error as Error).message);            
+        }
+    },
+    getComment: async (postId: string) => {
+        try {
+
+        } catch (error) {
+
             throw new Error((error as Error).message);
         }
     },
@@ -149,7 +157,7 @@ export const postRepo = {
                 commentId,
                 userId,
                 reply,
-                parentId: parentId || null,
+                parentId,
             });
             await newReply.save();
             return

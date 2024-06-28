@@ -9,7 +9,6 @@ import http from "http"
 import colors from 'colors.ts'
 import { Server } from "socket.io"
 
-
 colors?.enable()
 
 const app = express()
@@ -38,11 +37,12 @@ const onlineUsers = new Map();
 
 io.on("connection", (socket) => {
     socket.on('setup', (userData) => {
-        // console.log(userData)
+        console.log('User Connected')
         socket.join(userData.id)
         socket.userData = userData;
         onlineUsers.set(userData.id, userData);
-        io.emit('user-connected', { userId: userData.id, userName: userData.userName,profilePic:userData.profilePic });
+        io.emit('user-connected', { id: userData.id, userName: userData.userName, profilePic: userData.profilePic });
+        socket.emit('current-online-users', Array.from(onlineUsers.values()));
         socket.emit('connected', { socketId: socket.id });
     })
 
@@ -51,15 +51,16 @@ io.on("connection", (socket) => {
         console.log('user joined room : ', room)
     })
 
-    socket.on('join video chat', ({ roomId}) => {
+    socket.on('join video chat', ({ roomId }) => {
         socket.join(roomId);
         console.log(` joined video chat room: ${roomId}`);
     });
+
     socket.on('video-call', ({ roomId, callerId, recipientId }) => {
         console.log('inside video =- call')
         console.log(roomId)
         console.log(callerId)
-        console.log(recipientId,'recipientId')
+        console.log(recipientId, 'recipientId')
         socket.join(roomId);
         socket.to(recipientId).emit('video-call', { roomId, callerId });
         console.log(`user ${callerId} initiated video call to ${recipientId} in room: ${roomId}`);
@@ -78,31 +79,38 @@ io.on("connection", (socket) => {
     socket.on('stop typing', (room) => socket.in(room).emit("stop typing"))
 
 
-     //============ Handle WebRTC signaling messages=============
-     socket.on('webrtc-offer', (data) => {
-        // console.log(data)
+    //============ Handle WebRTC signaling messages=============
+    socket.on('webrtc-offer', (data) => {
         socket.to(data.roomId).emit('webrtc-offer', data);
-      });
-    
-      socket.on('webrtc-answer', (data) => {
+    });
+
+    socket.on('webrtc-answer', (data) => {
         socket.to(data.roomId).emit('webrtc-answer', data);
-      });
-    
-      socket.on('webrtc-ice-candidate', (data) => {
+    });
+
+    socket.on('webrtc-ice-candidate', (data) => {
         socket.to(data.roomId).emit('webrtc-ice-candidate', data);
-      });     
-      
-      socket.on('user-disconnected', (data) => {        
-        console.log(`USER DISCONNECTED: ${data.userId}`);
-        onlineUsers.delete(data.userId);
+    });
+
+    // socket.on('manual-disconnect', (data) => {
+    //     if (data.userId) {
+    //         onlineUsers.delete(data.userId);
+    //         io.emit('user-disconnected', { id: data.userId });
+    //     }
+    // });
+
+    socket.on('user-disconnected', (data) => {
+        console.log(`USER DISCONNECTED: ${data.id}`);
+        onlineUsers.delete(data.id);
         io.emit('user-disconnected', data);
     });
+
 
     socket.on("disconnect", () => {
         console.log("USER DISCONNECTED");
         if (socket.userData && socket.userData.id) {
             onlineUsers.delete(socket.userData.id);
-            io.emit('user-disconnected', { userId: socket.userData.id });
+            io.emit('user-disconnected', { id: socket.userData.id });
             socket.leave(socket.userData.id);
         }
     });

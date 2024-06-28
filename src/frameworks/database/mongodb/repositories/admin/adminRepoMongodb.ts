@@ -8,8 +8,7 @@ import { UserDocument } from "../../models/user";
 export const adminRepo = {
     loginAdmin: async (email: string, password: string): Promise<AdminDocument | null> => {
         try {
-            const admin: AdminDocument | null = await Admin.findOne({ email: email })
-            console.log(admin)
+            const admin: AdminDocument | null = await Admin.findOne({ email: email })           
             if (admin && (await admin.matchPassword(password))) {
                 return admin
             }

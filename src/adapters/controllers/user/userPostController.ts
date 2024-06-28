@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import userPostUseCase from "../../../app/usecases/users/post/userPostUseCase"
-import { commentData } from "../../../types/user/post"
+import { commentData, replyData } from "../../../types/user/post"
 
 export default {
     savePost: async (req: Request, res: Response) => {
@@ -29,7 +29,7 @@ export default {
         try {
             const perPage = req.query.perPage as string;
             const page = req.query.page as string;
-            console.log(page)
+        
             res.status(200).json(await userPostUseCase.userFeedPost(perPage, page))
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
@@ -71,9 +71,20 @@ export default {
             res.status(500).json({ error: (error as Error).message })
         }
     },
+    getComment:async(req:Request,res:Response)=>{
+        try {
+            const postId = req.query.postId as string
+            console.log(postId)
+            const comments = await userPostUseCase.getComment(postId)
+            // console.log(comments)
+            res.json(comments)
+        } catch (error) {            
+            res.status(500).json({ error: (error as Error).message })
+        }
+    },
     addReply: async (req: Request, res: Response) => {
         try {
-            const data = req.body
+            const data:replyData = req.body
             console.log(data)
             await userPostUseCase.replyUseCase(data)
             res.status(200).json({ message: 'comment added succesfully' })

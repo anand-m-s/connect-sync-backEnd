@@ -25,10 +25,12 @@ export default {
     },
     verifyUser: async (email: string) => {
         try {         
-            const user = await verifyUser(email)           
-            let token = generateToken(user.id)
+            const user = await verifyUser(email)   
+            const role:string = 'user'         
+            let token = generateToken(user.id,role)
             return { user, token }
         } catch (error) {
+
             throw new Error((error as Error).message)
         }
     },
@@ -45,7 +47,8 @@ export default {
                 if(existingUser.isBlocked){
                     throw new Error('User blocked')
                 }
-                 token = generateToken(existingUser.id)
+                const role:string= 'user'
+                 token = generateToken(existingUser.id,role)
                  user={
                     id:existingUser.id,
                     userName:existingUser.userName,
@@ -74,7 +77,8 @@ export default {
                     profilePic:savedUser.profilePic
                                        
                 }
-                let token = generateToken(user.id)
+                const role:string ='user'
+                let token = generateToken(user.id,role)
                 return {user,token}
             }
         } catch (error) {
