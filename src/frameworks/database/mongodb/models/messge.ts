@@ -5,6 +5,7 @@ export interface messageDocument extends Document {
     content: string;
     chat: mongoose.Types.ObjectId;
     files: string[];
+    sharedPost: mongoose.Types.ObjectId;
 }
 
 const messageSchema: Schema<messageDocument> = new Schema({
@@ -22,8 +23,12 @@ const messageSchema: Schema<messageDocument> = new Schema({
     },
     files: [{
         fileLink: String,
-        contentType:String,
+        contentType: String,
     }],
+    sharedPost: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'Post'
+    }
 }, {
     timestamps: true
 })

@@ -64,5 +64,18 @@ export default {
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
+    },
+    getNotification: async (req: Request, res: Response) => {
+        try {
+            const userId = req.user.userId as string
+            console.log(userId)
+            const data = await userProfileUseCase.getNotificationUseCase(userId)
+           
+            res.json({data})
+
+        } catch (error) {
+
+            res.status(500).json({ error: (error as Error).message })
+        }
     }
 }

@@ -72,6 +72,29 @@ export default {
             res.status(500).json({ error: (error as Error).message })
         }
     },
+    sharedPost: async (req: Request, res: Response) => {
+        try {
+            const { sharedPost, chatId } = req.body;
+            if (!sharedPost || !chatId) {
+                console.log("Invalid data passed into request");
+                return res.sendStatus(400);
+            }
+            const userId = req.user.userId
+            const data: any = {
+                sender: userId,
+                content: 'shared a post',
+                chat: chatId,
+                sharedPost:sharedPost
+            }
+
+            const message = await chatUseCase.sendFilesUsecase(data)
+            console.log(message)
+
+            res.status(200).json([message])
+        } catch (error) {
+            res.status(500).json({ error: (error as Error).message })
+        }
+    },
     fetchAllMessages: async (req: Request, res: Response) => {
         try {
             const { chatId } = req.params

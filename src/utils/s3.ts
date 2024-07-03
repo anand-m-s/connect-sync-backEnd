@@ -65,5 +65,5 @@ export async function createPresignedPost({
   const signedUrl = await getSignedUrl(s3, command, {
     expiresIn: 5 * 60, // 5 minutes - default is 15 mins
   });
-  return { fileLink, signedUrl };
+  return { fileLink, signedUrl};
 }

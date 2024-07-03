@@ -25,9 +25,8 @@ const chatRepo = {
         }
     },
     findChatBetweenUsers: async (userId: string, otherUserId: string) => {
-        try {
-         
-
+        try {         
+            
             let isChat = await Chat.find({
                 isGroupChat: false,
                 $and: [
@@ -87,15 +86,32 @@ const chatRepo = {
         try {            
             console.log({data})
             let message: any = await Message.create(data);
-            await message.populate([
+            // await message.populate([
+            //     { path: 'sender', select: 'userName profilePic' },
+            //     { path: 'chat' },
+            // ]).populate({
+            //     path:'sharedPost',select:'imageUrl userId'                
+            // })
+            await message
+            .populate([
                 { path: 'sender', select: 'userName profilePic' },
                 { path: 'chat' },
+                {
+                    path: 'sharedPost',
+                    select: 'imageUrl userId',
+                    populate: {
+                        path: 'userId',
+                        model: 'User',
+                        select: 'userName profilePic'
+                    }
+                }
             ])
             message = await User.populate(message, {
                 path: "chat.users",
                 select: "userName profilePic email",
             });
             await Chat.findByIdAndUpdate(data.chat, { latestMessage: message });            
+            console.log(message)
             return message;
         } catch (error) {
             throw new Error((error as Error).message);
@@ -104,8 +120,22 @@ const chatRepo = {
     fetchAllMessagesRepo: async (chatId: string) => {
         try {
             const messages = await Message.find({chat:chatId})
-            .populate('sender','userName profilePic email')
-            .populate('chat')
+            // .populate('sender','userName profilePic email')
+            // .populate('chat')
+            // .populate('sharedPost')
+            .populate([
+                { path: 'sender', select: 'userName profilePic' },
+                { path: 'chat' },
+                {
+                    path: 'sharedPost',
+                    select: 'imageUrl userId',
+                    populate: {
+                        path: 'userId',
+                        model: 'User',
+                        select: 'userName profilePic'
+                    }
+                }
+            ])
             return messages
         } catch (error) {
             throw new Error((error as Error).message);

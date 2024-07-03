@@ -1,6 +1,7 @@
-import { PostData, commentData, replyData, reportData } from "../../../../../types/user/post";
+import { PostData, PostInterface, commentData, replyData, reportData } from "../../../../../types/user/post";
 import Comment from "../../models/comment";
 import Like from "../../models/likes";
+import Notification from "../../models/notifications";
 import Post from "../../models/post";
 import Replay from "../../models/replies";
 import Report from "../../models/report";
@@ -100,7 +101,7 @@ export const postRepo = {
     getAllComments: async (postId: string) => {
         try {
 
-            const comments : any = await Comment.find({ postId })
+            const comments: any = await Comment.find({ postId })
                 .populate('userId', 'userName profilePic')
                 .lean();
 
@@ -111,7 +112,7 @@ export const postRepo = {
             // console.log(comments);
             return comments
         } catch (error) {
-            throw new Error((error as Error).message);            
+            throw new Error((error as Error).message);
         }
     },
     getComment: async (postId: string) => {
@@ -137,15 +138,31 @@ export const postRepo = {
             throw new Error((error as Error).message);
         }
     },
-    addCommentRepo: async (data: commentData) => {
+    addCommentRepo: async (data: commentData, userId: string) => {
         try {
             const newComment = await Comment.create({
                 postId: data.postId,
-                userId: data.userId,
+                userId: userId,
                 content: data.newComment
             })
             newComment.save()
-            return
+            const post: PostInterface | null = await Post.findOne({ _id: data.postId })
+                .populate({
+                    path: 'userId',
+                    select: 'userName profilePic'
+                }).select(userId)
+
+            if (post?.userId._id.toString() !== userId) {
+                await Notification.create({
+                    user: post?.userId._id,
+                    type: 'comment',
+                    follower: userId,
+                    content: 'commented on your post.'
+                })
+            }
+            console.log(post)
+
+            return post
         } catch (error) {
             throw new Error((error as Error).message);
         }
@@ -193,7 +210,32 @@ export const postRepo = {
             // Re-fetch to get the latest count ==========
             const likes: any = await Like.findOne({ postId });
             const likeCount: number = likes.likedUsers.length;
-            return { action, likeCount };
+
+            const post: PostInterface | null = await Post.findOne({ _id: postId })
+                .populate({
+                    path: 'userId',
+                    select: 'userName profilePic'
+                }).select(userId)            
+            if (action == 'Liked') {
+                if (post?.userId._id.toString() !== userId) {
+                    await Notification.create({
+                        user: post?.userId._id,
+                        type: 'like',
+                        follower: userId,
+                        content: 'liked your post.'
+                    })
+                }
+            } else {
+                if (post?.userId._id.toString() !== userId) {
+                    await Notification.findOneAndDelete({
+                        user: post?.userId._id,
+                        type: 'like',
+                        follower: userId,
+                        content: 'liked your post.'
+                    })
+                }
+            }
+            return { action, likeCount, user: post?.userId };
         } catch (error) {
             console.error('Error in likePost:', error);
             throw new Error((error as Error).message);

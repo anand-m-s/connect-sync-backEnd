@@ -61,5 +61,15 @@ export default {
         } catch (error) {
             throw new Error((error as Error).message)
         }
+    },
+    getNotificationUseCase: async (userId: string) => {
+        try {
+
+           
+            return await connection.getNotificationRepo(userId)
+        } catch (error) {
+
+            throw new Error((error as Error).message)
+        }
     }
 }

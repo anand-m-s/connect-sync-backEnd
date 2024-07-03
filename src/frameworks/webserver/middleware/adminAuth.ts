@@ -14,7 +14,7 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!)
             req.admin = decoded          
-            if (req.admin.role == 'admina') {
+            if (req.admin.role == 'admin') {
                 next()
             } else {
                 res.status(403).json({ message: 'Forbidden: Admins only' });

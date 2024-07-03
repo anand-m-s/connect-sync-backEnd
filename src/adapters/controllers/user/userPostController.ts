@@ -64,9 +64,9 @@ export default {
     addComment: async (req: Request, res: Response) => {
         try {
             const data = req.body
-            console.log(data)
-            await userPostUseCase.addCommentUseCase(data)
-            res.status(200).json({ message: 'comment added succesfully' })
+            const userId = req.user.userId           
+            const post = await userPostUseCase.addCommentUseCase(data,userId)
+            res.status(200).json({ message: 'comment added succesfully',post })
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
@@ -96,8 +96,8 @@ export default {
         try {
             const userId = req.user.userId
             const postId = req.query.postId as string;
-            const { action, likeCount } = await userPostUseCase.likePost(userId, postId)
-            res.status(200).json({ action, likeCount })
+            const { action, likeCount,user } = await userPostUseCase.likePost(userId, postId)
+            res.status(200).json({ action, likeCount,user })
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
             res.status(500).json({ error: (error as Error).message })

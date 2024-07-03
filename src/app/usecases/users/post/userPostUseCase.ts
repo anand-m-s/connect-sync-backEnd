@@ -92,9 +92,9 @@ export default {
 
         }
     },
-    addCommentUseCase: async (data: commentData) => {
+    addCommentUseCase: async (data: commentData,userId:string) => {
         try {
-            return await postRepo.addCommentRepo(data)
+            return await postRepo.addCommentRepo(data,userId)
         } catch (error) {
             throw new Error((error as Error).message)
         }

@@ -1,5 +1,15 @@
 
 
+export interface UserInterface {
+  _id: string;
+  userName: string;
+  profilePic: string;
+}
+export interface PostInterface {
+  _id: string;
+  userId: UserInterface; 
+}
+
 export interface PostData {
     _id:string;
     userId: string;
