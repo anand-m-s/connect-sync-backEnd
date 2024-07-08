@@ -1,7 +1,8 @@
 
-import { PostData, replyData, reportData } from "../../../../types/user/post"
+import { PostData, replyData, reportData, savedPost } from "../../../../types/user/post"
 import { postRepo } from "../../../../frameworks/database/mongodb/repositories/user/postRepo"
 import { commentData } from "../../../../types/user/post"
+
 
 export default {
     userPostSave: async (data: PostData) => {
@@ -25,25 +26,19 @@ export default {
             throw new Error((error as Error).message)
         }
     },
-    userFeedPost: async (perPage: string, page: string) => {
+    userFeedPost: async (perPage: string, page: string, userId: string) => {
         try {
-            // const perPageNum = parseInt(perPage, 10);
-            // const pageNum = parseInt(page, 10);
-            // const posts = await postRepo.getUsersPost(perPageNum,pageNum)
-            // // console.log({posts})
-            // return posts.map(post => {
-            //     const { _id, userId, imageUrl, location, description } = post;
-            //     const { userName, profilePic } = userId
-            //     return { _id, userId: userId._id, userName, profilePic, imageUrl, location, description };
-            // })
             const perPageNum = parseInt(perPage, 10);
             const pageNum = parseInt(page, 10);
             const posts = await postRepo.getUsersPost(perPageNum, pageNum);
-            // console.log(posts)  
+            const savedPosts = await postRepo.getSavedPostsRepo(userId)
+            const savedPostIds = savedPosts.map(savedPost => (savedPost.postId as any)._id.toString());
+            // console.log(savedPosts)
             const enrichedPosts = await Promise.all(posts.map(async post => {
                 const { _id, users, imageUrl, location, description, likes } = post;
                 const { userName, profilePic } = users;
                 const comments = await postRepo.getAllComments(_id);
+                const isSaved = savedPostIds.includes(_id.toString());
                 return {
                     _id,
                     userId: users._id,
@@ -55,7 +50,9 @@ export default {
                     likesCount: likes.length,
                     commentsCount: comments.length,
                     likedUsers: likes.map((like: { likedUsers: any }) => like.likedUsers).flat(),
-                    comments
+                    comments,
+                    isSaved
+
                 };
             }));
 
@@ -92,17 +89,17 @@ export default {
 
         }
     },
-    addCommentUseCase: async (data: commentData,userId:string) => {
+    addCommentUseCase: async (data: commentData, userId: string) => {
         try {
-            return await postRepo.addCommentRepo(data,userId)
+            return await postRepo.addCommentRepo(data, userId)
         } catch (error) {
             throw new Error((error as Error).message)
         }
     },
-    getComment:async(postId:string)=>{
+    getComment: async (postId: string) => {
         try {
             return await postRepo.getAllComments(postId)
-            
+
         } catch (error) {
             throw new Error((error as Error).message)
         }
@@ -135,7 +132,20 @@ export default {
             console.log('inside use case')
             return await postRepo.reportRepo(data);
         } catch (error) {
+            throw new Error((error as Error).message)
+        }
+    },
+    savedPostUseCase: async (data: savedPost) => {
+        try {
+            return await postRepo.savedPost(data)
 
+        } catch (error) {
+        }
+    },
+    getSavedPost: async (id: string) => {
+        try {
+            return await postRepo.getSavedPostsRepo(id)
+        } catch (error) {
             throw new Error((error as Error).message)
         }
     }

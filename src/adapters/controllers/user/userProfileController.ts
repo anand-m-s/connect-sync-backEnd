@@ -16,10 +16,11 @@ export default {
         }
     },
 
-    updateProfile: async (req: Request, res: Response) => {
-        console.log(req.body)
+    updateProfile: async (req: Request, res: Response) => {      
         try {
-            const updatedUser = await userProfileUseCase.updateProfileUseCase(req.body);
+            const data = req.body
+            const userId = req.user.userId as string
+            const updatedUser = await userProfileUseCase.updateProfileUseCase(data,userId);
             res.json(updatedUser);
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })

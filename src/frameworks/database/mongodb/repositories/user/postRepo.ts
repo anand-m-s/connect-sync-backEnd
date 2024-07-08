@@ -1,10 +1,11 @@
-import { PostData, PostInterface, commentData, replyData, reportData } from "../../../../../types/user/post";
+import { PostData, PostInterface, commentData, replyData, reportData, savedPost } from "../../../../../types/user/post";
 import Comment from "../../models/comment";
 import Like from "../../models/likes";
 import Notification from "../../models/notifications";
 import Post from "../../models/post";
 import Replay from "../../models/replies";
 import Report from "../../models/report";
+import SavedPost from "../../models/savedPost";
 
 
 
@@ -57,7 +58,7 @@ export const postRepo = {
                         foreignField: 'postId',
                         as: 'likes'
                     }
-                },
+                },         
                 {
                     $project: {
                         _id: 1,
@@ -69,7 +70,7 @@ export const postRepo = {
                         imageUrl: 1,
                         location: 1,
                         description: 1,
-                        likes: 1,
+                        likes: 1,                       
                         createdAt: 1
                     }
                 }
@@ -103,6 +104,7 @@ export const postRepo = {
 
             const comments: any = await Comment.find({ postId })
                 .populate('userId', 'userName profilePic')
+                .sort({ createdAt: 1 })
                 .lean();
 
             for (const comment of comments) {
@@ -215,7 +217,7 @@ export const postRepo = {
                 .populate({
                     path: 'userId',
                     select: 'userName profilePic'
-                }).select(userId)            
+                }).select(userId)
             if (action == 'Liked') {
                 if (post?.userId._id.toString() !== userId) {
                     await Notification.create({
@@ -297,5 +299,40 @@ export const postRepo = {
             throw new Error((error as Error).message);
 
         }
-    }
+    },
+    savedPost: async (data: savedPost) => {
+        try {
+            const existingSavedPosts = await SavedPost.find({ userId: data.userId });
+            const existingPost = existingSavedPosts.find(post => post.postId.toString() === data.postId.toString());
+            if (existingPost) {             
+                await SavedPost.deleteOne({ _id: existingPost._id });
+                return { message: "Post removed from saved collection" };
+            } else {
+                const newSavedPost = new SavedPost(data);
+                await newSavedPost.save();
+                return { message: "Post added to saved collection" };
+            }
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    },
+    getSavedPostsRepo: async (id: string) => {
+        try {
+            const savedPosts = await SavedPost.find({ userId: id })
+                .populate({
+                    path: 'postId',
+                    select: 'userId imageUrl location description',
+                    populate: {
+                        path: 'userId',
+                        select: 'userName profilePic'
+                    }
+                });
+    
+            return savedPosts;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    },
+  
+
 }

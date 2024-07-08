@@ -38,3 +38,8 @@ export interface reportData{
   reason:string;
   additionalReason:string;
 }
+
+export interface savedPost{
+  postId:string;
+  userId:string;
+}

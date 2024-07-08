@@ -1,39 +1,5 @@
-// import { NextFunction,Response,Request } from "express";
-// import jwt from 'jsonwebtoken'
-// import User from "../../database/mongodb/models/user";
-
-
-// declare module 'express-serve-static-core' {
-//     interface Request {
-//       user?: any;     
-//     }
-//   }
-// export const protectUser = async(req:Request,res:Response,next:NextFunction)=>{
-//     let token = req.header("Authorization")
-//     if(token){
-//         try {
-//             const decoded = jwt.verify(token,process.env.JWT_SECRET!)
-//             req.user= decoded        
-//             const userId = req.user.userId as string
-//             let user:any = await User.findOne({_id:userId})
-//             if(user.isBlocked) {
-//                 res.status(401)
-//                 throw new Error("User Is Blocked");
-//               }
-//             console.log({user})
-//             next()
-//         } catch (error) {
-//             res.status(401)            
-//             throw new Error("Not authorized Invalid token")            
-//         }        
-//     }else{
-//         res.status(401)
-//         throw new Error('Not authorized no token')
-//     }
-// }
-
 import { NextFunction, Response, Request } from "express";
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import User from "../../database/mongodb/models/user";
 
 declare module 'express-serve-static-core' {
@@ -43,13 +9,14 @@ declare module 'express-serve-static-core' {
 }
 
 export const protectUser = async (req: Request, res: Response, next: NextFunction) => {
-    let token = req.header("Authorization")
+        let token = req.header("Authorization")
     if (token) {
+        console.log('inside this auth middleware');
         try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string }
-            req.user = decoded
-            const userId = req.user.userId
-            let user: any = await User.findOne({ _id: userId })
+            const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };         
+            req.user = decoded;
+            const userId = req.user.userId;
+            let user: any = await User.findOne({ _id: userId });
             if (!user) {
                 res.status(401).json({ message: "User not found" });
                 return;
@@ -58,11 +25,15 @@ export const protectUser = async (req: Request, res: Response, next: NextFunctio
                 res.status(401).json({ message: "User Is Blocked" });
                 return;
             }
-            next()
+            next();
         } catch (error) {
-            res.status(401).json({ message: "Not authorized Invalid token" });
+            if (error instanceof jwt.TokenExpiredError) {
+                res.status(401).json({ message: "Token expired" });
+            } else {
+                res.status(401).json({ message: "Not authorized Invalid token" });
+            }
         }
     } else {
         res.status(401).json({ message: "Not authorized no token" });
     }
-}
+};

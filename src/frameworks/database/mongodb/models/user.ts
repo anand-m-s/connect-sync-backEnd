@@ -10,7 +10,7 @@ export interface UserDocument extends Document {
     isVerified: boolean;
     isGoogle: boolean;
     profilePic:string;
-    bio:string
+    bio:string;   
     matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -47,7 +47,7 @@ const userSchema: Schema<UserDocument> = new Schema(
         },
         bio:{
             type:String
-        }
+        },
     },
     {
         timestamps: true
@@ -68,6 +68,8 @@ userSchema.pre<UserDocument>("save", async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword: string) {
     return await bcrypt.compare(enteredPassword, this.password)
 }
+
+userSchema.index({ lastVerifiedAt: 1 }, { expireAfterSeconds: 20 * 24 * 60 * 60, partialFilterExpression: { isVerified: false } });
 
 const User = mongoose.model('User', userSchema);
 

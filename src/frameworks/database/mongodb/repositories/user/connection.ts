@@ -65,14 +65,14 @@ export const connection = {
         }
     },
     getNotificationRepo: async (userId: string) => {
-        try {   
-        
+        try {           
             const data: NotificationInterface[] = await Notification.find({ user: userId })
             .populate({
               path: 'follower',
               select: 'userName profilePic',
             })
-            .select('user type post comment follower content isRead createdAt updatedAt');
+            .select('user type post comment follower content isRead createdAt updatedAt')
+            .sort({ createdAt: -1 }).lean()
             
             return data
 

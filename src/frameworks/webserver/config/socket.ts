@@ -63,7 +63,7 @@ export default function initializeSocket(server: HTTPServer): Server {
         socket.on("typing", (room) => socket.in(room).emit("typing"));
         socket.on('stop typing', (room) => socket.in(room).emit("stop typing"));
 
-        // Handle WebRTC signaling messages
+        //==== Handle WebRTC signaling messages=====
         socket.on('webrtc-offer', (data) => {
             socket.to(data.roomId).emit('webrtc-offer', data);
         });
@@ -75,6 +75,12 @@ export default function initializeSocket(server: HTTPServer): Server {
         socket.on('webrtc-ice-candidate', (data) => {
             socket.to(data.roomId).emit('webrtc-ice-candidate', data);
         });
+
+        socket.on('call-ended', (data) => {
+            socket.to(data.roomId).emit('call-ended', data);
+        });
+
+
 
           // =====Listen for like events======
           socket.on('like', ({ postId, liker, postOwnerId }) => {

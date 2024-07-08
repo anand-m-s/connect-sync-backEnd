@@ -41,9 +41,9 @@ export const getUser = {
 
         }
     },
-    updateProfile: async (data: UserDocument) => {
+    updateProfile: async (data: UserDocument,userId:string) => {
         try {
-            const existingUser = await checkUserName(data.userName, data.id)
+            const existingUser = await checkUserName(data.userName, userId)
             if (existingUser) {
                 existingUser.bio = data.bio || '',
                     existingUser.userName = data.userName,

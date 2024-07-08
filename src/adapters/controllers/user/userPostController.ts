@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import userPostUseCase from "../../../app/usecases/users/post/userPostUseCase"
-import { commentData, replyData } from "../../../types/user/post"
+import { commentData, replyData, savedPost } from "../../../types/user/post"
 
 export default {
     savePost: async (req: Request, res: Response) => {
@@ -29,8 +29,9 @@ export default {
         try {
             const perPage = req.query.perPage as string;
             const page = req.query.page as string;
+            const userId= req.user.userId
         
-            res.status(200).json(await userPostUseCase.userFeedPost(perPage, page))
+            res.status(200).json(await userPostUseCase.userFeedPost(perPage, page,userId))
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
@@ -130,6 +131,33 @@ export default {
             console.log(report)
             res.status(200).json({ message: report });
         } catch (error) {
+            res.status(500).json({ error: (error as Error).message })
+        }
+    },
+    savedPost:async(req:Request,res:Response)=>{
+        try {
+            const userId = req.user.userId
+            const postId = req.query.postId as string
+            console.log(userId)
+            console.log(postId)
+            const data:savedPost={
+                userId,
+                postId
+            }
+            const result = await userPostUseCase.savedPostUseCase(data);
+            res.status(200).json(result);
+        } catch (error) {            
+            res.status(500).json({ error: (error as Error).message })
+        }
+    },
+    getSavedPosts:async(req:Request,res:Response)=>{
+        try {
+            const userId = req.user.userId
+            
+            console.log(userId)
+            const result = await userPostUseCase.getSavedPost(userId);
+            res.status(200).json(result);
+        } catch (error) {            
             res.status(500).json({ error: (error as Error).message })
         }
     }

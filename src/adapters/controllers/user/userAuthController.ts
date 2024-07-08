@@ -5,9 +5,11 @@ import { generateOtp } from "../../../utils/otpGeneratorFun"
 import { validateOtp } from "../../../utils/otpValidation"
 import { cleanupSessionData } from "../../../utils/sessionCleanUp"
 import { expiryCheck } from "../../../utils/otpExpireCheck";
+import jwt from 'jsonwebtoken';
+import { generateToken } from "../../../app/utils/generateToken";
 
 export default {
-        registerUser: async (req: Request, res: Response) => {
+    registerUser: async (req: Request, res: Response) => {
         try {
             const { email, userName } = req.body
             console.log(email, userName)
@@ -32,8 +34,9 @@ export default {
             }
             expiryCheck(req)
             cleanupSessionData(req)
-            const { user, token } = await userAuthUsecase.verifyUser(email)        
-            res.status(200).json({ message: 'OTP verified', user, token })
+            const { user, accessToken, refreshToken } = await userAuthUsecase.verifyUser(email)
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
+            res.status(200).json({ message: 'OTP verified', user, accessToken })
         }
         catch (error) {
             res.status(500).json({ error: (error as Error).message })
@@ -57,19 +60,22 @@ export default {
     loginUser: async (req: Request, res: Response) => {
         try {
             const { email, password } = req.body
-            const { user, token } = await userAuthUsecase.loginUser(email, password)           
+            const { user, accessToken, refreshToken } = await userAuthUsecase.loginUser(email, password)
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
             res.status(200).json({
                 message: 'login successfull!',
-                user, token
+                user, accessToken
             })
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
     },
     googleAuth: async (req: Request, res: Response) => {
-        try {           
+        try {
             const user = await userAuthUsecase.googleAuthUseCase(req.body)
-            res.status(200).json({ message: "User registered successfully", user: user?.user, token: user?.token });
+            // console.log(user!)
+            res.cookie('refreshToken', user?.refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
+            res.status(200).json({ message: "User registered successfully", user: user?.user, accessToken: user?.accessToken });
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })
         }
@@ -91,15 +97,28 @@ export default {
             res.status(500).json({ error: (error as Error).message });
         }
     },
-    updatePassword:async(req:Request,res:Response)=>{
+    updatePassword: async (req: Request, res: Response) => {
         try {
-            const {newPassword,email} = req.body
-            console.log(email,newPassword)
-            res.status(200).json(await userAuthUsecase.updatePassword(newPassword,email))            
+            const { newPassword, email } = req.body
+            console.log(email, newPassword)
+            res.status(200).json(await userAuthUsecase.updatePassword(newPassword, email))
+        } catch (error) {
+            res.status(500).json({ error: (error as Error).message });
+        }
+    },
+    refreshToken: async (req: Request, res: Response) => {
+        try {
+            const refreshToken = req.cookies.refreshToken;
+            if (!refreshToken) {
+                return res.status(401).json({ message: "Refresh token not provided" });
+            }
+            const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { userId: string, role: string };
+            console.log(decoded)
+            const { token: newAccessToken, refreshToken: newRefreshToken } = generateToken(decoded.userId, 'user');
+            res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
+            res.json({ accessToken: newAccessToken })
         } catch (error) {
             res.status(500).json({ error: (error as Error).message });
         }
     }
-
-
 }

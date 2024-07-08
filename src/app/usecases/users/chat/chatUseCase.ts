@@ -22,7 +22,7 @@ export default {
             throw new Error("UserId param not sent with request");
         }
 
-        let isChat = await chatRepo.findChatBetweenUsers(userId, otherUserId);
+        const isChat = await chatRepo.findChatBetweenUsers(userId, otherUserId);
 
         if (isChat.length > 0) {
             return { status: 200, data: isChat[0] };

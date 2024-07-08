@@ -14,10 +14,9 @@ export default {
         }
     },
 
-    updateProfileUseCase: async (data: UserDocument) => {
+    updateProfileUseCase: async (data: UserDocument,userId:string) => {
         try {
-            const user = await getUser.updateProfile(data)
-            console.log(user!)
+            const user = await getUser.updateProfile(data,userId)       
             if (user) {
                 const updatedUser = {
                     userName: user.userName,
@@ -63,9 +62,7 @@ export default {
         }
     },
     getNotificationUseCase: async (userId: string) => {
-        try {
-
-           
+        try {           
             return await connection.getNotificationRepo(userId)
         } catch (error) {
 

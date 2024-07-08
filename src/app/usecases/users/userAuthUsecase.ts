@@ -1,5 +1,5 @@
 import { userRegisterInterface } from "../../../types/user/userRegisterInterface"
-import {saveUser,saveUserGoogle,updatePassword} from "../../../frameworks/database/mongodb/repositories/user/userRepoMongoDb"
+import { saveUser, saveUserGoogle, updatePassword } from "../../../frameworks/database/mongodb/repositories/user/userRepoMongoDb"
 import { forgotPassword, verifyUser } from "../../../frameworks/database/mongodb/repositories/user/isVerified"
 import { generateToken } from "../../utils/generateToken"
 import { UserDocument } from "../../../frameworks/database/mongodb/models/user"
@@ -7,9 +7,9 @@ import { getUser } from "../../../frameworks/database/mongodb/repositories/user/
 
 export default {
     registerUser: async (data: userRegisterInterface) => {
-        try {         
+        try {
             console.log('inside register user')
-            const savedUser = await saveUser(data)      
+            const savedUser = await saveUser(data)
             const user = {
                 id: savedUser._id,
                 email: savedUser.email,
@@ -24,85 +24,92 @@ export default {
         }
     },
     verifyUser: async (email: string) => {
-        try {         
-            const user = await verifyUser(email)   
-            const role:string = 'user'         
-            let token = generateToken(user.id,role)
-            return { user, token }
+        try {
+            const user = await verifyUser(email)
+            const role: string = 'user'
+            let token = generateToken(user.id, role)
+            const accessToken = token.token
+            const refreshToken = token.refreshToken
+            return { user, accessToken, refreshToken }
         } catch (error) {
 
             throw new Error((error as Error).message)
         }
     },
-    
+
     loginUser: async (email: string, password: string) => {
         try {
-            const existingUser:UserDocument|null = await getUser.getUserByEmail(email)            
+            const existingUser: UserDocument | null = await getUser.getUserByEmail(email)
             let token;
             let user;
-            if(existingUser &&(await existingUser.matchPassword(password))){
-                if(!existingUser.isVerified){
-                   throw new Error('Not verified,Sign up again!')
+            if (existingUser && (await existingUser.matchPassword(password))) {
+                if (!existingUser.isVerified) {
+                    throw new Error('Not verified,Sign up again!')
                 }
-                if(existingUser.isBlocked){
+                if (existingUser.isBlocked) {
                     throw new Error('User blocked')
                 }
-                const role:string= 'user'
-                 token = generateToken(existingUser.id,role)
-                 user={
-                    id:existingUser.id,
-                    userName:existingUser.userName,
-                    email:existingUser.email,
-                    bio:existingUser?.bio,
-                    phone:existingUser?.phone,
-                    profilePic:existingUser?.profilePic,
-                 }
-            }else{
+                const role: string = 'user'
+                token = generateToken(existingUser.id, role)
+                user = {
+                    id: existingUser.id,
+                    userName: existingUser.userName,
+                    email: existingUser.email,
+                    bio: existingUser?.bio,
+                    phone: existingUser?.phone,
+                    profilePic: existingUser?.profilePic,
+                }
+            } else {
                 throw new Error('Invalid credentials')
             }
-            return {user,token}
+
+            const accessToken = token.token
+            const refreshToken = token.refreshToken
+            return { user, accessToken, refreshToken }
         } catch (error) {
             throw new Error((error as Error).message)
         }
     },
-    googleAuthUseCase:async(data:userRegisterInterface)=>{
+    googleAuthUseCase: async (data: userRegisterInterface) => {
         try {
             const savedUser = await saveUserGoogle(data)
-          
-            if(savedUser){
+
+            if (savedUser) {
                 const user = {
                     id: savedUser._id,
                     email: savedUser.email,
                     userName: savedUser.userName,
-                    profilePic:savedUser.profilePic
-                                       
+                    profilePic: savedUser.profilePic
+
                 }
-                const role:string ='user'
-                let token = generateToken(user.id,role)
-                return {user,token}
+                const role: string = 'user'
+                const token = generateToken(user.id, role)
+                const accessToken = token.token
+                const refreshToken = token.refreshToken
+                return { user, accessToken, refreshToken }
             }
         } catch (error) {
             throw new Error((error as Error).message)
         }
     },
-    forgotPassword:async(email:string)=>{
+    forgotPassword: async (email: string) => {
         try {
-           return await forgotPassword(email)
+            return await forgotPassword(email)
         } catch (error) {
             throw new Error((error as Error).message)
         }
     },
-    updatePassword:async(password:string,email:string)=>{
+    updatePassword: async (password: string, email: string) => {
         try {
             console.log('inside usecase')
             console.log(email)
             console.log(password)
-            return await updatePassword(password,email)
+            return await updatePassword(password, email)
         } catch (error) {
             throw new Error((error as Error).message)
-            
+
         }
     }
 
-    
+
 }

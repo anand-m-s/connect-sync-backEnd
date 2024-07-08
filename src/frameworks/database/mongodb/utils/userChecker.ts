@@ -8,9 +8,7 @@ export const checkExistingUser = async (email:string,userName:string) => {
 
 
 export const checkUserName = async(userName:string,id:string)=>{
-    console.log('inside checkUsername')
     const existingUser = await User.find({$or:[{_id:id},{userName:userName}]})
-    console.log(existingUser!)
    if(existingUser.length==1){
     return existingUser[0]
    }else{
