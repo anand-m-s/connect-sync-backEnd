@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import userAuthUsecase from '../../../app/usecases/users/userAuthUsecase'
 import sendVerifyMail from "../../../infrastructure/email/emailService"
 import { generateOtp } from "../../../utils/otpGeneratorFun"
@@ -7,12 +7,12 @@ import { cleanupSessionData } from "../../../utils/sessionCleanUp"
 import { expiryCheck } from "../../../utils/otpExpireCheck";
 import jwt from 'jsonwebtoken';
 import { generateToken } from "../../../app/utils/generateToken";
+import { verifiedTagInterface } from "../../../types/user/userRegisterInterface";
 
 export default {
-    registerUser: async (req: Request, res: Response) => {
+    registerUser: async (req: Request, res: Response,next:NextFunction) => {
         try {
-            const { email, userName } = req.body
-            console.log(email, userName)
+            const { email, userName } = req.body           
             const user = await userAuthUsecase.registerUser(req.body)
             if (user) {
                 const otp = generateOtp()
@@ -22,8 +22,8 @@ export default {
                 sendVerifyMail(req, userName, email)
             }
             res.status(200).json({ message: "User registered please verify otp now", user });
-        } catch (error) {
-            res.status(500).json({ error: (error as Error).message })
+        } catch (error) {        
+            next(error);
         }
     },
     verifyOtp: async (req: Request, res: Response) => {
@@ -113,10 +113,19 @@ export default {
                 return res.status(401).json({ message: "Refresh token not provided" });
             }
             const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!) as { userId: string, role: string };
-            console.log(decoded)
             const { token: newAccessToken, refreshToken: newRefreshToken } = generateToken(decoded.userId, 'user');
             res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
             res.json({ accessToken: newAccessToken })
+        } catch (error) {
+            res.status(500).json({ error: (error as Error).message });
+        }
+    },
+    verifiedTag: async (req: Request, res: Response) => {
+        try {       
+            const userId = req.user.userId
+            const data:verifiedTagInterface = req.body
+            await userAuthUsecase.verifyTagUseCase(data,userId)
+            res.json({ message: "Verified tag updated successfully" });
         } catch (error) {
             res.status(500).json({ error: (error as Error).message });
         }

@@ -8,7 +8,7 @@ import { UserDocument } from "../../models/user";
 export const adminRepo = {
     loginAdmin: async (email: string, password: string): Promise<AdminDocument | null> => {
         try {
-            const admin: AdminDocument | null = await Admin.findOne({ email: email })           
+            const admin: AdminDocument | null = await Admin.findOne({ email: email })
             if (admin && (await admin.matchPassword(password))) {
                 return admin
             }
@@ -19,7 +19,7 @@ export const adminRepo = {
     },
     fetchAllusers: async (): Promise<UserDocument[] | null> => {
         try {
-            const users = await User.find({}).select('userName email isBlocked profilePic').lean();
+            const users = await User.find({}).select('userName email isBlocked profilePic createdAt').lean();
             return users || null;
         } catch (error) {
             throw new Error((error as Error).message);
@@ -65,14 +65,31 @@ export const adminRepo = {
 
             if (!post) {
                 throw new Error('Post not found');
-            }              
+            }
             post.isBlocked = !post.isBlocked;
-            await post.save();    
+            await post.save();
             // console.log(post);
             return {
                 success: true,
                 message: `Post ${post.isBlocked ? 'blocked' : 'unblocked'} successfully`
             };
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    },
+    getPostData: async () => {
+        try {
+            const posts = await Post.find({}).select('userId createdAt').lean();
+            
+            return posts || null;
+        } catch (error) {
+            throw new Error((error as Error).message);
+        }
+    },
+    getReportData: async () => {
+        try {
+            const reports = await Report.find({}).select('userId createdAt').lean();
+            return reports || null;
         } catch (error) {
             throw new Error((error as Error).message);
         }

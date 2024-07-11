@@ -10,12 +10,11 @@ declare module 'express-serve-static-core' {
 
 export const protectUser = async (req: Request, res: Response, next: NextFunction) => {
         let token = req.header("Authorization")
-    if (token) {
-        console.log('inside this auth middleware');
+    if (token) {        
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };         
             req.user = decoded;
-            const userId = req.user.userId;
+            const userId = req.user.userId;         
             let user: any = await User.findOne({ _id: userId });
             if (!user) {
                 res.status(401).json({ message: "User not found" });

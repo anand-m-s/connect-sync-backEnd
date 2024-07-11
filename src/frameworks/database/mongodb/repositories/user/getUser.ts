@@ -11,14 +11,12 @@ export const getUser = {
         }
     },
     getUserDetails: async (id: string, current: string) => {
-        try {
-
-            const user = await User.findById(id)
-            // console.log({user})
-            const isFollow = await Connection.findOne({ userId: current })
-            const connectionData = await Connection.findOne({ userId: id })
-
-            // console.log({isFollow})
+        try {            
+            const [user, isFollow, connectionData] = await Promise.all([
+                User.findById(id),
+                Connection.findOne({ userId: current }),
+                Connection.findOne({ userId: id })
+            ])
             if (user) {
                 const isFollowing: Boolean | null = isFollow && isFollow.following.includes(user._id)
                 let data = {
@@ -29,19 +27,19 @@ export const getUser = {
                     profilePic: user.profilePic,
                     isFollowing: isFollowing,
                     following: connectionData?.followers.length,
-                    followers: connectionData?.following.length
+                    followers: connectionData?.following.length,
+                    verified: user.verifiedTag,
+                    verifyTagExp: user.verifiedTagPurchasedAt
                 }
                 return data
             } else {
                 throw new Error('user not found')
             }
-
         } catch (error) {
             throw new Error((error as Error).message);
-
         }
     },
-    updateProfile: async (data: UserDocument,userId:string) => {
+    updateProfile: async (data: UserDocument, userId: string) => {
         try {
             const existingUser = await checkUserName(data.userName, userId)
             if (existingUser) {

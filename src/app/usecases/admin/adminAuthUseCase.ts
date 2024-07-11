@@ -20,13 +20,14 @@ export default {
                 throw new Error('Invalid email or password');
             }
             const role:string = 'admin'
-
+            const token = generateToken(admin.id,role)
             return {
                 id: admin._id,
                 name: admin.name,
                 email: admin.email,
                 message: 'Login successful',
-                token:generateToken(admin.id,role)
+                token:token.token,
+                refreshToken:token.refreshToken
             };
         } catch (error) {
             throw new Error((error as Error).message)

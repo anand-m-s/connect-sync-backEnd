@@ -8,10 +8,13 @@ export const adminRouter = express.Router()
 
 adminRouter.post('/register',adminAuthController.registerAdmin)
 adminRouter.post('/login',adminAuthController.loginAdmin)
+adminRouter.post('/refresh-token', adminAuthController.refreshToken)
 adminRouter.get('/fetchUserData',protectAdmin,adminUserManagment.fetchUserData)
 adminRouter.post('/block',protectAdmin,adminUserManagment.userBlock)
 adminRouter.get('/getReport',protectAdmin,adminPostManagment.report)
 adminRouter.post('/blockReportedPost',protectAdmin,adminPostManagment.blockPost)
+adminRouter.get('/getPostData',protectAdmin,adminPostManagment.getPostData)
+adminRouter.get('/getReportData',protectAdmin,adminPostManagment.getReportData)
 
 
 

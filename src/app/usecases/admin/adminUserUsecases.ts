@@ -25,12 +25,30 @@ export const adminUserUsecases = {
 
         }
     },
-    blockPostUseCase:async (postId:string) => {
+    blockPostUseCase: async (postId: string) => {
         try {
             return await adminRepo.blockPostRepo(postId)
         } catch (error) {
             throw new Error((error as Error).message);
+            throw new Error((error as Error).message);
 
         }
     },
+    getPostUsecase: async () => {
+        try {
+            return await adminRepo.getPostData()
+
+        } catch (error) {
+
+            throw new Error((error as Error).message);
+        }
+    },
+    getReportUsecase: async () => {
+        try {
+            return await adminRepo.getReportData()
+        } catch (error) {
+
+            throw new Error((error as Error).message);
+        }
+    }
 };

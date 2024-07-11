@@ -58,24 +58,27 @@ export const postRepo = {
                         foreignField: 'postId',
                         as: 'likes'
                     }
-                },         
+                },
                 {
                     $project: {
                         _id: 1,
                         users: {
                             _id: 1,
                             userName: 1,
-                            profilePic: 1
+                            profilePic: 1,
+                            verifiedTag: 1,
+                            verifiedTagPurchasedAt: 1,
                         },
                         imageUrl: 1,
                         location: 1,
                         description: 1,
-                        likes: 1,                       
+                        likes: 1,
                         createdAt: 1
                     }
                 }
             ]);
         } catch (error) {
+          
             throw new Error((error as Error).message);
         }
     },
@@ -304,7 +307,7 @@ export const postRepo = {
         try {
             const existingSavedPosts = await SavedPost.find({ userId: data.userId });
             const existingPost = existingSavedPosts.find(post => post.postId.toString() === data.postId.toString());
-            if (existingPost) {             
+            if (existingPost) {
                 await SavedPost.deleteOne({ _id: existingPost._id });
                 return { message: "Post removed from saved collection" };
             } else {
@@ -327,12 +330,12 @@ export const postRepo = {
                         select: 'userName profilePic'
                     }
                 });
-    
+
             return savedPosts;
         } catch (error) {
             throw new Error((error as Error).message);
         }
     },
-  
+
 
 }

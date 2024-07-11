@@ -103,6 +103,11 @@ export default function initializeSocket(server: HTTPServer): Server {
             console.log(followedBy)
             socket.to(userId).emit('followers',{followedBy})
         })
+        //call decline
+        socket.on('call-declined', (data) => {
+            console.log(`Call declined by user: ${data.userId}`);
+            socket.to(data.roomId).emit('call-declined', data);
+        });
 
         socket.on('user-disconnected', (data) => {
             // console.log(`USER DISCONNECTED: ${data.id}`);

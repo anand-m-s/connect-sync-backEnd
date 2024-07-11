@@ -30,7 +30,7 @@ export default {
             const perPage = req.query.perPage as string;
             const page = req.query.page as string;
             const userId= req.user.userId
-        
+       
             res.status(200).json(await userPostUseCase.userFeedPost(perPage, page,userId))
         } catch (error) {
             res.status(500).json({ error: (error as Error).message })

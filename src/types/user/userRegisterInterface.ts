@@ -20,12 +20,20 @@ export interface NotificationInterface {
   updatedAt: Date;
 }
 
+export interface verifiedTagInterface{
+  payment:string;
+  paymentId:string;
+  amount:number;
+}
+
 export interface userRegisterInterface{
     email:string;
     userName:string;
     password:string;
     phone:string;
     profilePic:string;
+    verified:boolean,
+    verifiedExp:Date;
 }
 
 export interface connectionInterface{

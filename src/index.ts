@@ -8,6 +8,7 @@ import { chatRouter } from "./frameworks/webserver/routes/chat"
 import http from "http"
 import colors from 'colors.ts'
 import initializeSocket from "./frameworks/webserver/config/socket"
+import errorHandler from "./errors/errorHandler"
 
 colors?.enable()
 
@@ -23,6 +24,8 @@ expressConfig(app)
 app.use('/api', userRouter)
 app.use('/api/admin', adminRouter)
 app.use('/api/chat', chatRouter)
+
+app.use(errorHandler)
 
 
 serverConfig(server).startServer();

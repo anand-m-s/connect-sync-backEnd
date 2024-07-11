@@ -1,5 +1,5 @@
-import { userRegisterInterface } from "../../../types/user/userRegisterInterface"
-import { saveUser, saveUserGoogle, updatePassword } from "../../../frameworks/database/mongodb/repositories/user/userRepoMongoDb"
+import { userRegisterInterface, verifiedTagInterface } from "../../../types/user/userRegisterInterface"
+import { saveUser, saveUserGoogle, updatePassword, verifyTagRepo } from "../../../frameworks/database/mongodb/repositories/user/userRepoMongoDb"
 import { forgotPassword, verifyUser } from "../../../frameworks/database/mongodb/repositories/user/isVerified"
 import { generateToken } from "../../utils/generateToken"
 import { UserDocument } from "../../../frameworks/database/mongodb/models/user"
@@ -8,15 +8,13 @@ import { getUser } from "../../../frameworks/database/mongodb/repositories/user/
 export default {
     registerUser: async (data: userRegisterInterface) => {
         try {
-            console.log('inside register user')
+          
             const savedUser = await saveUser(data)
             const user = {
                 id: savedUser._id,
                 email: savedUser.email,
                 userName: savedUser.userName
-            }
-            console.log(savedUser!)
-            console.log(user!)
+            }           
             return user
 
         } catch (error) {
@@ -58,6 +56,9 @@ export default {
                     bio: existingUser?.bio,
                     phone: existingUser?.phone,
                     profilePic: existingUser?.profilePic,
+                    verified:existingUser?.verifiedTag,
+                    verifiedExp:existingUser?.verifiedTagPurchasedAt
+
                 }
             } else {
                 throw new Error('Invalid credentials')
@@ -74,20 +75,20 @@ export default {
         try {
             const savedUser = await saveUserGoogle(data)
 
-            if (savedUser) {
-                const user = {
-                    id: savedUser._id,
-                    email: savedUser.email,
-                    userName: savedUser.userName,
-                    profilePic: savedUser.profilePic
-
-                }
+                // const user = {
+                //     id: savedUser._id,
+                //     email: savedUser.email,
+                //     userName: savedUser.userName,
+                //     profilePic: savedUser.profilePic,
+                //     verified:saveUser?.verified,
+                //     verifiedExp:saveUser?.verifiedExp
+                // }
                 const role: string = 'user'
-                const token = generateToken(user.id, role)
+                const token = generateToken(savedUser.id, role)
                 const accessToken = token.token
                 const refreshToken = token.refreshToken
-                return { user, accessToken, refreshToken }
-            }
+                return { user:savedUser, accessToken, refreshToken }
+            
         } catch (error) {
             throw new Error((error as Error).message)
         }
@@ -105,6 +106,15 @@ export default {
             console.log(email)
             console.log(password)
             return await updatePassword(password, email)
+        } catch (error) {
+            throw new Error((error as Error).message)
+
+        }
+    },
+    verifyTagUseCase: async (data:verifiedTagInterface,userId:string) => {
+        try {
+            await verifyTagRepo(data,userId)
+
         } catch (error) {
             throw new Error((error as Error).message)
 

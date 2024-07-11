@@ -28,15 +28,15 @@ export default {
     },
     userFeedPost: async (perPage: string, page: string, userId: string) => {
         try {
+         
             const perPageNum = parseInt(perPage, 10);
             const pageNum = parseInt(page, 10);
-            const posts = await postRepo.getUsersPost(perPageNum, pageNum);
+            const posts = await postRepo.getUsersPost(perPageNum, pageNum);          
             const savedPosts = await postRepo.getSavedPostsRepo(userId)
-            const savedPostIds = savedPosts.map(savedPost => (savedPost.postId as any)._id.toString());
-            // console.log(savedPosts)
+            const savedPostIds = savedPosts.map(savedPost => (savedPost.postId as any)._id.toString())
             const enrichedPosts = await Promise.all(posts.map(async post => {
                 const { _id, users, imageUrl, location, description, likes } = post;
-                const { userName, profilePic } = users;
+                const { userName, profilePic,verifiedTag,verifiedTagPurchasedAt } = users;
                 const comments = await postRepo.getAllComments(_id);
                 const isSaved = savedPostIds.includes(_id.toString());
                 return {
@@ -44,6 +44,8 @@ export default {
                     userId: users._id,
                     userName,
                     profilePic,
+                    verified:verifiedTag,
+                    verifiedExp:verifiedTagPurchasedAt,
                     imageUrl,
                     location,
                     description,
@@ -58,6 +60,7 @@ export default {
 
             return enrichedPosts;
         } catch (error) {
+       
             throw new Error((error as Error).message)
         }
     },

@@ -13,15 +13,18 @@ export const protectAdmin = async (req: Request, res: Response, next: NextFuncti
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET!)
-            req.admin = decoded          
+            req.admin = decoded
             if (req.admin.role == 'admin') {
                 next()
             } else {
                 res.status(403).json({ message: 'Forbidden: Admins only' });
             }
         } catch (error) {
-            res.status(401)
-            throw new Error("Not authorized Invalid token")
+            if (error instanceof jwt.TokenExpiredError) {
+                res.status(401).json({ message: "Token expired" });
+            } else {
+                res.status(401).json({ message: "Not authorized Invalid token" });
+            }
         }
     } else {
         res.status(401)

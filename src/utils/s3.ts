@@ -63,7 +63,7 @@ export async function createPresignedPost({
   });
   const fileLink = `https://${BUCKET_NAME}.s3.${awsConfig.AWS.Region}.amazonaws.com/${key}`;
   const signedUrl = await getSignedUrl(s3, command, {
-    expiresIn: 5 * 60, // 5 minutes - default is 15 mins
+    expiresIn: 5 * 60, //=======default is 15m ,changed to 5m
   });
   return { fileLink, signedUrl};
 }
