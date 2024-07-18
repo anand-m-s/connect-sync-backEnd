@@ -1,1 +1,0 @@
-{"version":3,"file":"sessionCleanUp.js","sourceRoot":"","sources":["../../src/utils/sessionCleanUp.ts"],"names":[],"mappings":";;;AAEO,MAAM,kBAAkB,GAAG,CAAC,GAAY,EAAE,EAAE;IAC/C,MAAM,WAAW,GAAG,GAAG,CAAC,OAAQ,CAAC;IACjC,OAAO,WAAW,CAAC,WAAW,CAAC;IAC/B,OAAO,WAAW,CAAC,GAAG,CAAC;IACvB,OAAO,WAAW,CAAC,gBAAgB,CAAC;AACxC,CAAC,CAAC;AALW,QAAA,kBAAkB,sBAK7B"}
